@@ -1,0 +1,149 @@
+classDiagram
+direction TB
+
+    %% ==========================================
+    %% CAMADA 1: WEB / CONTROLLERS & DTOs
+    %% ==========================================
+    namespace Web_Layer {
+        class AuthController {
+            +registrar(RegistroUsuarioDTO dto) ResponseEntity~UsuarioDTO~
+            +login(LoginDTO dto) ResponseEntity~TokenDTO~
+            +verificarConta(String token) ResponseEntity~Void~
+        }
+        class CampeonatoController {
+            +criar(CriarCampeonatoDTO dto) ResponseEntity~CampeonatoDTO~
+            +listarPublicos() ResponseEntity~List~CampeonatoDTO~~
+            +buscarPorId(Long id) ResponseEntity~CampeonatoDTO~
+        }
+        class TimeCampeonatoController {
+            +cadastrarTime(CriarTimeDTO dto) ResponseEntity~TimeDTO~
+            +inscreverTimeNoCampeonato(Long campId, Long timeId) ResponseEntity~Void~
+            +definirLocalMando(Long timeId, MandoDTO dto) ResponseEntity~Void~
+        }
+    }
+
+    %% ==========================================
+    %% CAMADA 2: APPLICATION / USE CASES
+    %% ==========================================
+    namespace Application_Layer {
+        class RegistrarUsuarioUseCase {
+            +execute(RegistroUsuarioCommand cmd) Usuario
+        }
+        class AutenticarUsuarioUseCase {
+            +execute(LoginCommand cmd) String
+        }
+        class CadastrarCampeonatoUseCase {
+            +execute(CriarCampeonatoCommand cmd) Campeonato
+        }
+        class InscreverTimeCampeonatoUseCase {
+            +execute(Long campeonatoId, Long timeId) Void
+        }
+        class DefinirLocalMandoUseCase {
+            +execute(Long timeId, String localMando) Void
+        }
+    }
+
+    %% ==========================================
+    %% CAMADA 3: DOMAIN (CORE & INTERFACES)
+    %% ==========================================
+    namespace Domain_Layer {
+        class Usuario {
+            -Long id
+            -String nome
+            -String email
+            -String senhaHash
+            -PerfilUsuario perfil
+            -Boolean contaVerificada
+            -Boolean aceiteTermosLgpd
+            +validarAceiteTermos() void
+        }
+        class PerfilUsuario {
+            <<enumeration>>
+            ADMIN
+            ORGANIZADOR
+            DIRIGENTE
+            ESPECTADOR
+        }
+        class Campeonato {
+            -Long id
+            -String nome
+            -String descricao
+            -ModalidadeEsportiva modalidade
+            -FormatoCompeticao formato
+            -Integer maxTimes
+            -String premiacao
+            -StatusCampeonato status
+            +validarCapacidadeTimes(int qtdAtual) void
+        }
+        class Time {
+            -Long id
+            -String nome
+            -String sigla
+            -String localMando
+        }
+        class InscricaoCampeonato {
+            -Long id
+            -LocalDateTime dataInscricao
+            -StatusInscricao status
+        }
+
+        class UsuarioRepository {
+            <<interface>>
+            +save(Usuario u) Usuario
+            +findByEmail(String email) Optional~Usuario~
+        }
+        class CampeonatoRepository {
+            <<interface>>
+            +save(Campeonato c) Campeonato
+            +findById(Long id) Optional~Campeonato~
+            +findAll() List~Campeonato~
+        }
+        class TimeRepository {
+            <<interface>>
+            +save(Time t) Time
+            +findById(Long id) Optional~Time~
+        }
+    }
+
+    %% ==========================================
+    %% CAMADA 4: PERSISTENCE (SPRING DATA JPA)
+    %% ==========================================
+    namespace Persistence_Layer {
+        class UsuarioEntity
+        class CampeonatoEntity
+        class TimeEntity
+        class InscricaoCampeonatoEntity
+        class UsuarioRepositoryImpl
+        class CampeonatoRepositoryImpl
+        class TimeRepositoryImpl
+    }
+
+    %% Relacionamentos de Domínio
+    Usuario "1" -- "1" PerfilUsuario : possui
+    Usuario "1" -- "0..*" Campeonato : organiza
+    Usuario "1" -- "0..*" Time : dirige
+    Campeonato "1" *-- "0..*" InscricaoCampeonato : contem
+    Time "1" *-- "0..*" InscricaoCampeonato : participa
+
+    %% Fluxo Web -> Application
+    AuthController --> RegistrarUsuarioUseCase
+    AuthController --> AutenticarUsuarioUseCase
+    CampeonatoController --> CadastrarCampeonatoUseCase
+    TimeCampeonatoController --> InscreverTimeCampeonatoUseCase
+    TimeCampeonatoController --> DefinirLocalMandoUseCase
+
+    %% Fluxo Application -> Domain
+    RegistrarUsuarioUseCase --> UsuarioRepository
+    AutenticarUsuarioUseCase --> UsuarioRepository
+    CadastrarCampeonatoUseCase --> CampeonatoRepository
+    InscreverTimeCampeonatoUseCase --> CampeonatoRepository
+    InscreverTimeCampeonatoUseCase --> TimeRepository
+    DefinirLocalMandoUseCase --> TimeRepository
+
+    %% Inversão de Dependência (Persistence -> Domain)
+    UsuarioRepositoryImpl ..|> UsuarioRepository
+    CampeonatoRepositoryImpl ..|> CampeonatoRepository
+    TimeRepositoryImpl ..|> TimeRepository
+    UsuarioRepositoryImpl --> UsuarioEntity
+    CampeonatoRepositoryImpl --> CampeonatoEntity
+    TimeRepositoryImpl --> TimeEntity
