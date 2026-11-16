@@ -16,16 +16,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.esproject4.arenaufcg.DTO.auth.AuthResponseDTO;
+import com.esproject4.arenaufcg.DTO.auth.LoginRequestDTO;
+import com.esproject4.arenaufcg.DTO.auth.RegisterRequestDTO;
+import com.esproject4.arenaufcg.DTO.auth.UsuarioResponseDTO;
 import com.esproject4.arenaufcg.Model.User;
 import com.esproject4.arenaufcg.Model.ValueObjects.Email;
-import com.esproject4.arenaufcg.dto.AuthResponseDTO;
-import com.esproject4.arenaufcg.dto.LoginRequestDTO;
-import com.esproject4.arenaufcg.dto.RegisterRequestDTO;
-import com.esproject4.arenaufcg.dto.UsuarioResponseDTO;
 import com.esproject4.arenaufcg.exception.RegraNegocioException;
 import com.esproject4.arenaufcg.repository.UserRepository;
+import com.esproject4.arenaufcg.service.security.PasswordHasher;
+import com.esproject4.arenaufcg.service.security.TokenClaims;
+import com.esproject4.arenaufcg.service.security.TokenProvider;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
