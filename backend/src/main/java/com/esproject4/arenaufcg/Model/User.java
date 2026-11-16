@@ -27,7 +27,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"password", "resetPasswordToken"})
+@ToString(exclude = {"password", "resetPasswordToken", "verifyToken"})
 public class User {
 
     @Id
@@ -40,7 +40,7 @@ public class User {
     @JsonProperty("name")
     private String name;
 
-    @Embedded 
+    @Embedded
     @JsonProperty("email")
     private Email email;
 
@@ -67,6 +67,10 @@ public class User {
     @JsonProperty("acceptedTerms")
     private Boolean acceptedTerms;
 
+    @Column(name = "verify_token", length = 255)
+    @JsonIgnore
+    private String verifyToken;
+
     @Column(name = "verify_token_expires_in")
     @JsonProperty("verifyTokenExpiresIn")
     private OffsetDateTime verifyTokenExpiresIn;
@@ -78,6 +82,10 @@ public class User {
     @Column(name = "reset_password_token_expires_in")
     @JsonProperty("resetPasswordTokenExpiresIn")
     private OffsetDateTime resetPasswordTokenExpiresIn;
+
+    @Column(name = "last_login_at")
+    @JsonProperty("lastLoginAt")
+    private OffsetDateTime lastLoginAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
