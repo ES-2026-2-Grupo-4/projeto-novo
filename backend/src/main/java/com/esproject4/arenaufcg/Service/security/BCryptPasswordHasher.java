@@ -1,4 +1,4 @@
-package com.esproject4.arenaufcg.Service;
+package com.esproject4.arenaufcg.Service.security;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;

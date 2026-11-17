@@ -16,20 +16,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.esproject4.arenaufcg.DTO.auth.AuthResponseDTO;
-import com.esproject4.arenaufcg.DTO.auth.LoginRequestDTO;
-import com.esproject4.arenaufcg.DTO.auth.RegisterRequestDTO;
-import com.esproject4.arenaufcg.DTO.auth.UsuarioResponseDTO;
 import com.esproject4.arenaufcg.Model.User;
 import com.esproject4.arenaufcg.Model.ValueObjects.Email;
-import com.esproject4.arenaufcg.exception.RegraNegocioException;
+import com.esproject4.arenaufcg.Service.security.NotificacaoService;
+import com.esproject4.arenaufcg.Service.security.PasswordHasher;
+import com.esproject4.arenaufcg.Service.security.RegraNegocioException;
+import com.esproject4.arenaufcg.Service.security.TokenClaims;
+import com.esproject4.arenaufcg.Service.security.TokenProvider;
+import com.esproject4.arenaufcg.dto.AuthResponseDTO;
+import com.esproject4.arenaufcg.dto.LoginRequestDTO;
+import com.esproject4.arenaufcg.dto.RegisterRequestDTO;
+import com.esproject4.arenaufcg.dto.UserResponseDTO;
 import com.esproject4.arenaufcg.repository.UserRepository;
-import com.esproject4.arenaufcg.service.security.PasswordHasher;
-import com.esproject4.arenaufcg.service.security.TokenClaims;
-import com.esproject4.arenaufcg.service.security.TokenProvider;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -86,7 +86,7 @@ public class AuthService {
         return montarResposta(user);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponseDTO login(LoginRequestDTO dto) {
         // Mesma resposta para e-mail inexistente e senha errada (não revela quais e-mails existem).
         User user = buscarPorEmail(dto.email()).orElseThrow(this::credenciaisInvalidas);
@@ -103,6 +103,11 @@ public class AuthService {
             throw new RegraNegocioException(HttpStatus.FORBIDDEN, "CONTA_NAO_VERIFICADA",
                     "Verifique seu e-mail antes de entrar.");
         }
+
+        // Registra o último acesso bem-sucedido (RF: atualiza ultimo_login_em).
+        user.setLastLoginAt(OffsetDateTime.now());
+        userRepository.save(user);
+
         return montarResposta(user);
     }
 
@@ -169,7 +174,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public UsuarioResponseDTO getSessionUser(String bearerToken) {
+    public UserResponseDTO getSessionUser(String bearerToken) {
         if (bearerToken == null || !bearerToken.regionMatches(true, 0, "Bearer ", 0, 7)) {
             throw tokenSessaoInvalido();
         }
@@ -178,11 +183,11 @@ public class AuthService {
         User user = userRepository.findById(claims.userId())
                 .filter(u -> Boolean.TRUE.equals(u.getActive()))
                 .orElseThrow(this::tokenSessaoInvalido);
-        return UsuarioResponseDTO.from(user);
+        return UserResponseDTO.from(user);
     }
 
     private AuthResponseDTO montarResposta(User user) {
-        return AuthResponseDTO.of(tokenProvider.gerarToken(user), UsuarioResponseDTO.from(user));
+        return AuthResponseDTO.of(tokenProvider.gerarToken(user), UserResponseDTO.from(user));
     }
 
     private void validarSenha(String senha, String confirmaSenha) {

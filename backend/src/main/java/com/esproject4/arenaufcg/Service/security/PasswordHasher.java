@@ -1,4 +1,4 @@
-package com.esproject4.arenaufcg.Service;
+package com.esproject4.arenaufcg.Service.security;
 
 public interface PasswordHasher {
     String hash(String senhaPlana);
