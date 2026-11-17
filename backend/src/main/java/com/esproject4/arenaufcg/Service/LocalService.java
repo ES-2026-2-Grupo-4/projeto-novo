@@ -1,5 +1,7 @@
 package com.esproject4.arenaufcg.Service;
 
+import java.util.List;
+
 import com.esproject4.arenaufcg.Model.Local;
 import com.esproject4.arenaufcg.Model.TipoLocal;
 import com.esproject4.arenaufcg.Repository.LocalRepository;
@@ -20,5 +22,10 @@ public class LocalService {
         Local local = new Local(nome, endereco, tipo);
 
         return localRepository.save(local);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Local> listar() {
+       return localRepository.findAll();
     }
 }
