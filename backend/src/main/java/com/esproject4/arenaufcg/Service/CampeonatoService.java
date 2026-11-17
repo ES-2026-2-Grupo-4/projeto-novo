@@ -1,11 +1,10 @@
 package com.esproject4.arenaufcg.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.esproject4.arenaufcg.Model.Campeonato;
 import com.esproject4.arenaufcg.Model.FormatoDisputa;
+import com.esproject4.arenaufcg.Model.Local;
 import com.esproject4.arenaufcg.Model.Modalidade;
 import com.esproject4.arenaufcg.Repository.CampeonatoRepository;
-import com.esproject4.arenaufcg.Model.Local;
 import com.esproject4.arenaufcg.Repository.LocalRepository;
 
 @Service
@@ -23,17 +22,24 @@ public class CampeonatoService {
 
     private final CampeonatoRepository campeonatoRepository;
     private final LocalRepository localRepository;
+    private final ConsultaOrganizador consultaOrganizador;
+    private final ConsultaInscricoes consultaInscricoes;
 
     public CampeonatoService(
             CampeonatoRepository campeonatoRepository,
-            LocalRepository localRepository) {
+            LocalRepository localRepository,
+            ConsultaOrganizador consultaOrganizador,
+            ConsultaInscricoes consultaInscricoes) {
 
-       this.localRepository = localRepository;
         this.campeonatoRepository = campeonatoRepository;
+        this.localRepository = localRepository;
+        this.consultaOrganizador = consultaOrganizador;
+        this.consultaInscricoes = consultaInscricoes;
     }
 
     @Transactional
     public Campeonato criar(
+            UUID usuarioId,
             String nome,
             String descricao,
             Modalidade modalidade,
@@ -41,10 +47,23 @@ public class CampeonatoService {
             Integer quantidadeGrupos,
             int maxTimes,
             LocalDate dataInicio,
-            LocalDate dataFim,
-            UUID organizadorId) {
+            LocalDate dataFim) {
 
-        exigirUsuarioIdentificado(organizadorId);
+        if (!consultaOrganizador.isOrganizador(usuarioId)) {
+            throw new RegraNegocioException(
+                HttpStatus.FORBIDDEN,
+                "NAO_ORGANIZADOR",
+                "Somente organizadores podem criar campeonatos."
+            );
+        }
+
+        if (!consultaOrganizador.isContaVerificada(usuarioId)) {
+            throw new RegraNegocioException(
+                HttpStatus.FORBIDDEN,
+                "CONTA_NAO_VERIFICADA",
+                "Verifique sua conta antes de criar campeonatos."
+            );
+        }
 
         Campeonato campeonato = new Campeonato(
             nome,
@@ -55,7 +74,7 @@ public class CampeonatoService {
             maxTimes,
             dataInicio,
             dataFim,
-            organizadorId
+            usuarioId
         );
 
         return campeonatoRepository.save(campeonato);
@@ -63,16 +82,12 @@ public class CampeonatoService {
 
     @Transactional(readOnly = true)
     public List<Campeonato> listarMeus(UUID usuarioId) {
-        exigirUsuarioIdentificado(usuarioId);
-
         return campeonatoRepository
-            .findByOrganizadorIdAndAtivoTrue(usuarioId);
+            .findAllByOrganizadorIdAndAtivoTrueOrderByCriadoEmDesc(usuarioId);
     }
 
     @Transactional(readOnly = true)
     public Campeonato buscar(UUID campeonatoId, UUID usuarioId) {
-        exigirUsuarioIdentificado(usuarioId);
-
         Campeonato campeonato = campeonatoRepository
             .findByIdAndAtivoTrue(campeonatoId)
             .orElseThrow(() -> new RegraNegocioException(
@@ -92,106 +107,100 @@ public class CampeonatoService {
         return campeonato;
     }
 
-    private void exigirUsuarioIdentificado(UUID usuarioId) {
-        if (usuarioId == null) {
-            throw new RegraNegocioException(
-                HttpStatus.UNAUTHORIZED,
-                "NAO_AUTENTICADO",
-                "É necessário identificar o usuário."
-            );
-        }
+    @Transactional
+    public Campeonato atualizar(
+            UUID campeonatoId,
+            UUID usuarioId,
+            String nome,
+            String descricao,
+            Modalidade modalidade,
+            FormatoDisputa formato,
+            Integer quantidadeGrupos,
+            int maxTimes,
+            LocalDate dataInicio,
+            LocalDate dataFim) {
+
+        Campeonato campeonato = buscar(campeonatoId, usuarioId);
+
+        campeonato.atualizar(
+            nome,
+            descricao,
+            modalidade,
+            formato,
+            quantidadeGrupos,
+            maxTimes,
+            dataInicio,
+            dataFim
+        );
+
+        return campeonatoRepository.save(campeonato);
     }
 
     @Transactional
-   public Campeonato atualizar(
-           UUID campeonatoId,
-           UUID usuarioId,
-           String nome,
-           String descricao,
-           Modalidade modalidade,
-           FormatoDisputa formato,
-           Integer quantidadeGrupos,
-           int maxTimes,
-           LocalDate dataInicio,
-           LocalDate dataFim) {
+    public void remover(UUID campeonatoId, UUID usuarioId) {
+        Campeonato campeonato = buscar(campeonatoId, usuarioId);
 
-       Campeonato campeonato = buscar(campeonatoId, usuarioId);
+        if (!campeonato.jaIniciou()
+                && consultaInscricoes.possuiInscricoesAtivas(campeonatoId)) {
+            throw new RegraNegocioException(
+                HttpStatus.CONFLICT,
+                "INSCRICOES_ATIVAS",
+                "Não é possível remover um campeonato com inscrições pendentes ou aprovadas."
+            );
+        }
 
-       campeonato.atualizar(
-           nome,
-           descricao,
-           modalidade,
-           formato,
-           quantidadeGrupos,
-           maxTimes,
-           dataInicio,
-           dataFim
-       );
+        campeonato.remover();
 
-       return campeonatoRepository.save(campeonato);
-   }
+        campeonatoRepository.save(campeonato);
+    }
 
-   @Transactional
-   public Campeonato abrirInscricoes(
-           UUID campeonatoId, UUID usuarioId) {
+    @Transactional
+    public Campeonato abrirInscricoes(UUID campeonatoId, UUID usuarioId) {
+        Campeonato campeonato = buscar(campeonatoId, usuarioId);
 
-       Campeonato campeonato = buscar(campeonatoId, usuarioId);
+        campeonato.abrirInscricoes();
 
-       campeonato.abrirInscricoes();
+        return campeonatoRepository.save(campeonato);
+    }
 
-       return campeonatoRepository.save(campeonato);
-   }
+    @Transactional
+    public Campeonato encerrarInscricoes(UUID campeonatoId, UUID usuarioId) {
+        Campeonato campeonato = buscar(campeonatoId, usuarioId);
 
-   @Transactional
-   public Campeonato encerrarInscricoes(
-           UUID campeonatoId, UUID usuarioId) {
+        campeonato.encerrarInscricoes();
 
-       Campeonato campeonato = buscar(campeonatoId, usuarioId);
+        return campeonatoRepository.save(campeonato);
+    }
 
-       campeonato.encerrarInscricoes();
+    @Transactional
+    public Campeonato definirLocais(
+            UUID campeonatoId,
+            UUID usuarioId,
+            Collection<UUID> locaisIds) {
 
-       return campeonatoRepository.save(campeonato);
-   }
+        Campeonato campeonato = buscar(campeonatoId, usuarioId);
 
-   @Transactional
-   public Campeonato definirLocais(
-           UUID campeonatoId,
-           UUID usuarioId,
-           Collection<UUID> locaisIds) {
+        if (locaisIds == null || locaisIds.contains(null)) {
+            throw new RegraNegocioException(
+                HttpStatus.BAD_REQUEST,
+                "DADOS_INVALIDOS",
+                "Informe uma lista de identificadores de locais válidos."
+            );
+        }
 
-       Campeonato campeonato = buscar(campeonatoId, usuarioId);
+        var idsUnicos = new HashSet<>(locaisIds);
+        List<Local> locais = localRepository.findAllById(idsUnicos);
 
-       if (campeonato.jaIniciou()) {
-           throw new RegraNegocioException(
-               HttpStatus.UNPROCESSABLE_CONTENT,
-               "CAMPEONATO_INICIADO",
-               "Os locais não podem ser alterados depois do início."
-           );
-       }
+        if (locais.size() != idsUnicos.size()) {
+            throw new RegraNegocioException(
+                HttpStatus.NOT_FOUND,
+                "NAO_ENCONTRADO",
+                "Um ou mais locais não foram encontrados."
+            );
+        }
 
-       if (locaisIds == null || locaisIds.contains(null)) {
-           throw new RegraNegocioException(
-               HttpStatus.BAD_REQUEST,
-               "DADOS_INVALIDOS",
-               "Informe uma lista de identificadores de locais válidos."
-           );
-       }
+        campeonato.definirLocais(locais);
 
-       var idsUnicos = new HashSet<>(locaisIds);
-       var locais = new ArrayList<Local>(
-           localRepository.findAllById(idsUnicos)
-       );
-
-       if (locais.size() != idsUnicos.size()) {
-           throw new RegraNegocioException(
-               HttpStatus.NOT_FOUND,
-               "NAO_ENCONTRADO",
-               "Um ou mais locais não foram encontrados."
-           );
-       }
-
-       campeonato.definirLocais(locais);
-
-       return campeonatoRepository.save(campeonato);
-   }
+        return campeonatoRepository.save(campeonato);
+    }
 }
