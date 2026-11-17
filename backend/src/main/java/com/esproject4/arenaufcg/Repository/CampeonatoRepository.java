@@ -15,4 +15,6 @@ public interface CampeonatoRepository extends JpaRepository<Campeonato, UUID> {
 
     /** "Meus campeonatos": só os ativos do organizador, mais recentes primeiro. */
     List<Campeonato> findAllByOrganizadorIdAndAtivoTrueOrderByCriadoEmDesc(UUID organizadorId);
+
+    List<Campeonato> findByOrganizadorIdAndAtivoTrue(UUID organizadorId);
 }
