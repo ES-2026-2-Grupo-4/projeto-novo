@@ -1,10 +1,26 @@
 export type UserRole = 'ORGANIZADOR' | 'DIRIGENTE' | 'ARBITRO' | 'ESPECTADOR';
 
+export type NivelCompeticao = 'RECREATIVO' | 'AMADOR' | 'SEMIPRO';
+
+export type ModalidadeEsportiva =
+  | 'FUTEBOL'
+  | 'FUTSAL'
+  | 'BASQUETE'
+  | 'VOLEI'
+  | 'HANDEBOL'
+  | 'TENIS_DE_MESA'
+  | 'XADREZ'
+  | 'E_SPORTS';
+
 export interface User {
   id: string;
   nome: string;
   email: string;
   perfil: UserRole;
+  telefone?: string;
+  local?: string;
+  modalidades?: string[];
+  nivelCompeticao?: NivelCompeticao;
   verificado: boolean;
   criadoEm?: string;
 }
@@ -25,6 +41,10 @@ export interface RegisterData {
   senha: string;
   confirmaSenha: string;
   perfil: UserRole;
+  telefone: string;
+  local: string;
+  modalidades: string[];
+  nivelCompeticao: NivelCompeticao;
   aceiteTermos: boolean;
 }
 

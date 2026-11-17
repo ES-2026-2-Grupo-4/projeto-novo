@@ -237,6 +237,11 @@ button, input, select, textarea {
 .auth-card-wrapper {
   width: 100%;
   max-width: 460px;
+  transition: max-width var(--transition-normal);
+}
+
+.auth-card-wrapper.auth-card-wrapper-lg {
+  max-width: 760px;
 }
 
 .auth-card {
@@ -1564,3 +1569,420 @@ button, input, select, textarea {
     display: none;
   }
 }
+
+/* ==========================================================================
+   Cadastro em Etapas (Multi-step Register & Stepper)
+   ========================================================================== */
+
+.stepper-wrapper {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.stepper-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+
+.stepper-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  flex: 1;
+}
+
+.stepper-item:last-child {
+  flex: 0 0 auto;
+}
+
+.stepper-bubble {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card-subtle);
+  border: 2px solid var(--border-color);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  z-index: 2;
+}
+
+.stepper-bubble.clickable {
+  cursor: pointer;
+}
+
+.stepper-bubble.clickable:hover {
+  transform: scale(1.08);
+  border-color: var(--primary);
+}
+
+.step-active .stepper-bubble {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.2);
+}
+
+.step-completed .stepper-bubble {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #ffffff;
+}
+
+.stepper-check-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.stepper-label-box {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.stepper-step-number {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  letter-spacing: 0.5px;
+}
+
+.step-active .stepper-step-number {
+  color: var(--primary);
+}
+
+.stepper-step-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.stepper-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+  margin: 0 12px;
+  transition: background-color var(--transition-normal);
+}
+
+.stepper-connector.connector-active {
+  background: var(--color-success);
+}
+
+/* Form Multi-step Pane */
+.auth-form-multi-step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step-pane {
+  animation: fadeIn 0.22s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.step-section-header {
+  text-align: left;
+  margin-bottom: 4px;
+}
+
+.step-section-title {
+  font-size: 16.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.step-section-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.step-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ==========================================================================
+   Barra de Força da Senha (PasswordStrengthBar)
+   ========================================================================== */
+
+.password-strength-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+  text-align: left;
+}
+
+.strength-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+}
+
+.strength-title {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.strength-label {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.strength-bars-track {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.strength-segment {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  transition: background-color 200ms ease;
+}
+
+.segment-empty {
+  background: var(--border-color);
+}
+
+.strength-very-weak {
+  background: #ef4444;
+  color: #ef4444;
+}
+
+.strength-weak {
+  background: #f97316;
+  color: #f97316;
+}
+
+.strength-medium {
+  background: #eab308;
+  color: #ca8a04;
+}
+
+.strength-strong {
+  background: #10b981;
+  color: #059669;
+}
+
+/* ==========================================================================
+   Cards Selecionáveis (SelectableCard: Perfil, Modalidades e Níveis)
+   ========================================================================== */
+
+.cards-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.grid-modalidades {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-niveis {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.selectable-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 180ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  user-select: none;
+  outline: none;
+}
+
+.selectable-card:hover:not(.is-disabled) {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.selectable-card:focus-visible {
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3);
+}
+
+.selectable-card.is-selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .selectable-card.is-selected {
+    background: rgba(var(--primary-rgb), 0.15);
+  }
+}
+
+.selectable-card.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-icon-bubble {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card-subtle);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 180ms ease;
+}
+
+.selectable-card.is-selected .card-icon-bubble {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.card-indicators {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+}
+
+.selectable-card.is-selected .card-badge {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.card-check-badge {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 180ms ease;
+}
+
+.card-check-badge.unchecked {
+  color: var(--border-color);
+  opacity: 0.6;
+}
+
+.card-check-badge.checked {
+  color: var(--primary);
+  opacity: 1;
+}
+
+.selectable-card .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-item-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.card-item-description {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.terms-acceptance-box {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  text-align: left;
+}
+
+/* Responsividade do Stepper e Cards */
+@media (max-width: 768px) {
+  .grid-modalidades {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-niveis {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .stepper-label-box {
+    display: none;
+  }
+
+  .stepper-connector {
+    margin: 0 8px;
+  }
+
+  .form-grid-2col {
+    grid-template-columns: 1fr;
+  }
+
+  .cards-selection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-modalidades {
+    grid-template-columns: 1fr;
+  }
+}
+

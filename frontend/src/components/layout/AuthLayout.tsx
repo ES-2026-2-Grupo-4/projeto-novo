@@ -4,10 +4,11 @@ import { TrophyIcon } from '../common/Icons.tsx';
 interface AuthLayoutProps {
   title: string;
   subtitle?: string;
+  size?: 'md' | 'lg';
   children: ReactNode;
 }
 
-export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
+export function AuthLayout({ title, subtitle, size = 'md', children }: AuthLayoutProps) {
   return (
     <div className="auth-page-container">
       <div className="auth-brand-header">
@@ -18,7 +19,7 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
         <p className="auth-brand-tagline">Sistema de Gestão de Campeonatos Esportivos</p>
       </div>
 
-      <div className="auth-card-wrapper">
+      <div className={`auth-card-wrapper ${size === 'lg' ? 'auth-card-wrapper-lg' : ''}`}>
         <div className="auth-card">
           <div className="auth-card-header">
             <h2 className="auth-card-title">{title}</h2>
