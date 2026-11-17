@@ -86,7 +86,7 @@ public class AuthService {
         return montarResposta(user);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponseDTO login(LoginRequestDTO dto) {
         // Mesma resposta para e-mail inexistente e senha errada (não revela quais
         // e-mails existem).
@@ -104,6 +104,9 @@ public class AuthService {
             throw new RegraNegocioException(HttpStatus.FORBIDDEN, "CONTA_NAO_VERIFICADA",
                     "Verifique seu e-mail antes de entrar.");
         }
+
+        user.setLastLoginAt(OffsetDateTime.now());
+        userRepository.save(user);
         return montarResposta(user);
     }
 
