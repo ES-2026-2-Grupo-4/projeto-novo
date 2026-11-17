@@ -1,0 +1,66 @@
+.
+├── eslint.config.js
+├── estrutura.txt
+├── index.html
+├── package.json
+├── package-lock.json
+├── public
+│   ├── favicon.svg
+│   └── icons.svg
+├── README.md
+├── src
+│   ├── api
+│   │   ├── authApi.ts
+│   │   └── client.ts
+│   ├── App.css
+│   ├── App.tsx
+│   ├── assets
+│   │   ├── hero.png
+│   │   ├── react.svg
+│   │   └── vite.svg
+│   ├── components
+│   │   ├── common
+│   │   │   ├── Alert.tsx
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── Checkbox.tsx
+│   │   │   ├── Icons.tsx
+│   │   │   ├── Input.tsx
+│   │   │   ├── PasswordStrengthBar.tsx
+│   │   │   ├── SelectableCard.tsx
+│   │   │   ├── Select.tsx
+│   │   │   └── StepProgress.tsx
+│   │   └── layout
+│   │       ├── AppLayout.tsx
+│   │       ├── AuthLayout.tsx
+│   │       └── Navbar.tsx
+│   ├── context
+│   │   ├── authContextInstance.ts
+│   │   ├── AuthContext.tsx
+│   │   └── useAuth.ts
+│   ├── index.css
+│   ├── main.tsx
+│   ├── pages
+│   │   ├── auth
+│   │   │   ├── ForgotPasswordPage.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── RegisterPage.tsx
+│   │   │   ├── ResetPasswordPage.tsx
+│   │   │   └── VerifyAccountPage.tsx
+│   │   ├── dashboard
+│   │   │   └── DashboardPage.tsx
+│   │   ├── NotFoundPage.tsx
+│   │   ├── profile
+│   │   │   └── ProfilePage.tsx
+│   │   └── UnauthorizedPage.tsx
+│   ├── routes
+│   │   ├── ProtectedRoute.tsx
+│   │   └── PublicRoute.tsx
+│   └── types
+│       └── auth.ts
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+
+15 directories, 49 files

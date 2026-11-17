@@ -1,12 +1,12 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/useAuth.ts';
-import { TrophyIcon, LogOutIcon, UserIcon, ShieldIcon } from '../common/Icons.tsx';
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth.ts";
+import { TrophyIcon, LogOutIcon, UserIcon, ShieldIcon } from "../common/Icons.tsx";
 
 const ROLE_LABELS: Record<string, string> = {
-  ORGANIZADOR: 'Organizador',
-  DIRIGENTE: 'Dirigente',
-  ARBITRO: 'Árbitro',
-  ESPECTADOR: 'Espectador',
+  ORGANIZADOR: "Organizador",
+  DIRIGENTE: "Dirigente",
+  ARBITRO: "Árbitro",
+  ESPECTADOR: "Espectador",
 };
 
 export function Navbar() {
@@ -15,18 +15,18 @@ export function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const getInitials = (name?: string) => {
-    if (!name) return 'U';
+    if (!name) return "U";
     return name
       .trim()
-      .split(' ')
+      .split(" ")
       .filter(Boolean)
       .slice(0, 2)
       .map((n) => n[0].toUpperCase())
-      .join('');
+      .join("");
   };
 
   return (
@@ -42,6 +42,9 @@ export function Navbar() {
         <nav className="navbar-links">
           <Link to="/dashboard" className="navbar-link">
             Dashboard
+          </Link>
+          <Link to="/campeonatos" className="navbar-link">
+            Campeonatos
           </Link>
           <Link to="/perfil" className="navbar-link">
             Meu Perfil

@@ -19,6 +19,10 @@ import { ProfilePage } from "./pages/profile/ProfilePage.tsx";
 import { UnauthorizedPage } from "./pages/UnauthorizedPage.tsx";
 import { NotFoundPage } from "./pages/NotFoundPage.tsx";
 
+// Páginas de Campeonatos
+import { ChampionshipsListPage } from "./pages/championships/ChampionshipsListPage.tsx";
+import { ChampionshipFormPage } from "./pages/championships/ChampionshipFormPage.tsx";
+
 export function App() {
   return (
     <AuthProvider>
@@ -43,6 +47,9 @@ export function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/perfil" element={<ProfilePage />} />
+              <Route path="/campeonatos" element={<ChampionshipsListPage />} />
+              <Route path="/campeonatos/novo" element={<ChampionshipFormPage />} />
+              <Route path="/campeonatos/:id/editar" element={<ChampionshipFormPage />} />
             </Route>
           </Route>
 

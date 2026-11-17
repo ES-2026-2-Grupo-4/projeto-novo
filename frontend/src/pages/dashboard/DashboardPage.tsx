@@ -1,21 +1,15 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/useAuth.ts';
-import { Card } from '../../components/common/Card.tsx';
-import { Button } from '../../components/common/Button.tsx';
-import { Alert } from '../../components/common/Alert.tsx';
-import {
-  TrophyIcon,
-  ShieldIcon,
-  CheckCircleIcon,
-  AlertCircleIcon,
-  UserIcon,
-} from '../../components/common/Icons.tsx';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/useAuth.ts";
+import { Card } from "../../components/common/Card.tsx";
+import { Button } from "../../components/common/Button.tsx";
+import { Alert } from "../../components/common/Alert.tsx";
+import { TrophyIcon, ShieldIcon, CheckCircleIcon, AlertCircleIcon, UserIcon } from "../../components/common/Icons.tsx";
 
 export function DashboardPage() {
   const { user, token, refreshUser } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [apiFeedback, setApiFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [apiFeedback, setApiFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const handleTestApiCall = async () => {
     setIsRefreshing(true);
@@ -23,13 +17,13 @@ export function DashboardPage() {
     try {
       await refreshUser();
       setApiFeedback({
-        type: 'success',
-        message: 'Requisição HTTP GET /api/v1/auth/me executada com sucesso usando o token Bearer!',
+        type: "success",
+        message: "Requisição HTTP GET /api/v1/auth/me executada com sucesso usando o token Bearer!",
       });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Falha na requisição à API.';
+      const msg = err instanceof Error ? err.message : "Falha na requisição à API.";
       setApiFeedback({
-        type: 'error',
+        type: "error",
         message: `Erro na requisição: ${msg}`,
       });
     } finally {
@@ -39,15 +33,15 @@ export function DashboardPage() {
 
   const getRoleBadgeClass = (role?: string) => {
     switch (role) {
-      case 'ORGANIZADOR':
-        return 'badge-organizador';
-      case 'DIRIGENTE':
-        return 'badge-dirigente';
-      case 'ARBITRO':
-        return 'badge-arbitro';
-      case 'ESPECTADOR':
+      case "ORGANIZADOR":
+        return "badge-organizador";
+      case "DIRIGENTE":
+        return "badge-dirigente";
+      case "ARBITRO":
+        return "badge-arbitro";
+      case "ESPECTADOR":
       default:
-        return 'badge-espectador';
+        return "badge-espectador";
     }
   };
 
@@ -55,14 +49,24 @@ export function DashboardPage() {
     if (!user) return null;
 
     switch (user.perfil) {
-      case 'ORGANIZADOR':
+      case "ORGANIZADOR":
         return (
           <div className="role-actions-grid">
             <div className="action-card">
               <span className="action-tag">Gestão</span>
               <h4>Criar Novo Campeonato</h4>
               <p>Configure modalidades, regulamentos, fases de grupos e eliminatórias.</p>
-              <button className="btn btn-outline btn-sm">Novo Torneio</button>
+              <Link to="/campeonatos/novo" className="btn btn-outline btn-sm">
+                Novo Torneio
+              </Link>
+            </div>
+            <div className="action-card">
+              <span className="action-tag">Torneios</span>
+              <h4>Meus Campeonatos</h4>
+              <p>Gerencie locais, edite regras e abra ou encerre o período de inscrições.</p>
+              <Link to="/campeonatos" className="btn btn-outline btn-sm">
+                Gerenciar Torneios
+              </Link>
             </div>
             <div className="action-card">
               <span className="action-tag">Inscrições</span>
@@ -70,15 +74,9 @@ export function DashboardPage() {
               <p>Avalie as equipes e documentos submetidos pelos dirigentes esportivos.</p>
               <button className="btn btn-outline btn-sm">Ver Inscrições</button>
             </div>
-            <div className="action-card">
-              <span className="action-tag">Tabela</span>
-              <h4>Gerar Calendário</h4>
-              <p>Distribua confrontos, horários e quadras na Arena UFCG.</p>
-              <button className="btn btn-outline btn-sm">Gerar Tabela</button>
-            </div>
           </div>
         );
-      case 'DIRIGENTE':
+      case "DIRIGENTE":
         return (
           <div className="role-actions-grid">
             <div className="action-card">
@@ -95,7 +93,7 @@ export function DashboardPage() {
             </div>
           </div>
         );
-      case 'ARBITRO':
+      case "ARBITRO":
         return (
           <div className="role-actions-grid">
             <div className="action-card">
@@ -112,7 +110,7 @@ export function DashboardPage() {
             </div>
           </div>
         );
-      case 'ESPECTADOR':
+      case "ESPECTADOR":
       default:
         return (
           <div className="role-actions-grid">
@@ -141,11 +139,11 @@ export function DashboardPage() {
             <ShieldIcon className="pill-icon" /> Rota Protegida (Área Autenticada)
           </span>
           <h1 className="hero-greeting">
-            Olá, <strong>{user?.nome || 'Usuário'}</strong>!
+            Olá, <strong>{user?.nome || "Usuário"}</strong>!
           </h1>
           <p className="hero-description">
-            Bem-vindo à plataforma de competições esportivas <strong>Arena UFCG</strong>. Seu
-            acesso está ativo com o perfil <strong>{user?.perfil}</strong>.
+            Bem-vindo à plataforma de competições esportivas <strong>Arena UFCG</strong>. Seu acesso está ativo com o
+            perfil <strong>{user?.perfil}</strong>.
           </p>
         </div>
         <div className="hero-badge-col">
@@ -156,11 +154,7 @@ export function DashboardPage() {
       </div>
 
       {apiFeedback && (
-        <Alert
-          variant={apiFeedback.type}
-          onClose={() => setApiFeedback(null)}
-          className="mb-4"
-        >
+        <Alert variant={apiFeedback.type} onClose={() => setApiFeedback(null)} className="mb-4">
           {apiFeedback.message}
         </Alert>
       )}
@@ -171,8 +165,7 @@ export function DashboardPage() {
             <div>
               <strong>Sua conta ainda não foi verificada por e-mail.</strong>
               <p>
-                Insira o código de 6 dígitos enviado para <strong>{user.email}</strong> para
-                liberar todos os recursos.
+                Insira o código de 6 dígitos enviado para <strong>{user.email}</strong> para liberar todos os recursos.
               </p>
             </div>
             <Link to="/verificar-conta" className="btn btn-sm btn-outline mt-2">
@@ -206,9 +199,7 @@ export function DashboardPage() {
             </div>
             <div className="detail-item">
               <span className="detail-label">Perfil / Role:</span>
-              <span className={`detail-val badge ${getRoleBadgeClass(user?.perfil)}`}>
-                {user?.perfil}
-              </span>
+              <span className={`detail-val badge ${getRoleBadgeClass(user?.perfil)}`}>{user?.perfil}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Status da Conta:</span>
@@ -226,23 +217,18 @@ export function DashboardPage() {
             </div>
             <div className="detail-item">
               <span className="detail-label">ID do Usuário (UUID):</span>
-              <span className="detail-val mono-text">{user?.id || '—'}</span>
+              <span className="detail-val mono-text">{user?.id || "—"}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Token de Acesso (Bearer):</span>
               <span className="detail-val mono-text token-snippet">
-                {token ? `${token.slice(0, 16)}...${token.slice(-8)}` : 'Nenhum'}
+                {token ? `${token.slice(0, 16)}...${token.slice(-8)}` : "Nenhum"}
               </span>
             </div>
           </div>
 
           <div className="card-action-bar">
-            <Button
-              variant="outline"
-              size="sm"
-              isLoading={isRefreshing}
-              onClick={handleTestApiCall}
-            >
+            <Button variant="outline" size="sm" isLoading={isRefreshing} onClick={handleTestApiCall}>
               Testar Requisição HTTP (/api/v1/auth/me)
             </Button>
           </div>
@@ -266,8 +252,8 @@ export function DashboardPage() {
               <div>
                 <strong>Guarda de Rotas (ProtectedRoute)</strong>
                 <p>
-                  Intercepta tentativas de acesso a páginas restritas. Se o token não existir
-                  ou for inválido, redireciona para <code>/login</code> preservando o histórico.
+                  Intercepta tentativas de acesso a páginas restritas. Se o token não existir ou for inválido,
+                  redireciona para <code>/login</code> preservando o histórico.
                 </p>
               </div>
             </div>
@@ -277,8 +263,8 @@ export function DashboardPage() {
               <div>
                 <strong>Injeção Automática de Headers HTTP</strong>
                 <p>
-                  O cliente HTTP adiciona automaticamente o cabeçalho{' '}
-                  <code>Authorization: Bearer &lt;token&gt;</code> em todas as requisições autenticadas.
+                  O cliente HTTP adiciona automaticamente o cabeçalho <code>Authorization: Bearer &lt;token&gt;</code>{" "}
+                  em todas as requisições autenticadas.
                 </p>
               </div>
             </div>
@@ -288,8 +274,8 @@ export function DashboardPage() {
               <div>
                 <strong>Tratamento de Sessão Expirada (401)</strong>
                 <p>
-                  Se o backend retornar código HTTP 401, o estado da sessão é automaticamente limpo
-                  e o usuário é direcionado para a tela de autenticação.
+                  Se o backend retornar código HTTP 401, o estado da sessão é automaticamente limpo e o usuário é
+                  direcionado para a tela de autenticação.
                 </p>
               </div>
             </div>
@@ -299,9 +285,7 @@ export function DashboardPage() {
 
       {/* Ações específicas por perfil */}
       <div className="role-actions-section">
-        <h3 className="section-title">
-          Painel de Ações &bull; {user?.perfil}
-        </h3>
+        <h3 className="section-title">Painel de Ações &bull; {user?.perfil}</h3>
         {renderRoleSpecificActions()}
       </div>
     </div>
