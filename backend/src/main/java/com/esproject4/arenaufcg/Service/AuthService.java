@@ -20,13 +20,13 @@ import com.esproject4.arenaufcg.Model.User;
 import com.esproject4.arenaufcg.Model.ValueObjects.Email;
 import com.esproject4.arenaufcg.Service.security.NotificacaoService;
 import com.esproject4.arenaufcg.Service.security.PasswordHasher;
-import com.esproject4.arenaufcg.Service.security.RegraNegocioException;
 import com.esproject4.arenaufcg.Service.security.TokenClaims;
 import com.esproject4.arenaufcg.Service.security.TokenProvider;
 import com.esproject4.arenaufcg.dto.AuthResponseDTO;
 import com.esproject4.arenaufcg.dto.LoginRequestDTO;
 import com.esproject4.arenaufcg.dto.RegisterRequestDTO;
-import com.esproject4.arenaufcg.dto.UserResponseDTO;
+import com.esproject4.arenaufcg.dto.UsuarioResponseDTO;
+import com.esproject4.arenaufcg.exception.RegraNegocioException;
 import com.esproject4.arenaufcg.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -86,9 +86,10 @@ public class AuthService {
         return montarResposta(user);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public AuthResponseDTO login(LoginRequestDTO dto) {
-        // Mesma resposta para e-mail inexistente e senha errada (não revela quais e-mails existem).
+        // Mesma resposta para e-mail inexistente e senha errada (não revela quais
+        // e-mails existem).
         User user = buscarPorEmail(dto.email()).orElseThrow(this::credenciaisInvalidas);
 
         if (!passwordHasher.verificar(dto.senha(), user.getPassword())) {
@@ -103,11 +104,6 @@ public class AuthService {
             throw new RegraNegocioException(HttpStatus.FORBIDDEN, "CONTA_NAO_VERIFICADA",
                     "Verifique seu e-mail antes de entrar.");
         }
-
-        // Registra o último acesso bem-sucedido (RF: atualiza ultimo_login_em).
-        user.setLastLoginAt(OffsetDateTime.now());
-        userRepository.save(user);
-
         return montarResposta(user);
     }
 
@@ -135,7 +131,8 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    // Silencioso de propósito: responde igual exista ou não o e-mail (evita enumeração de usuários).
+    // Silencioso de propósito: responde igual exista ou não o e-mail (evita
+    // enumeração de usuários).
     @Transactional
     public void forgotPassword(String userEmail) {
         buscarPorEmail(userEmail)
@@ -174,7 +171,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponseDTO getSessionUser(String bearerToken) {
+    public UsuarioResponseDTO getSessionUser(String bearerToken) {
         if (bearerToken == null || !bearerToken.regionMatches(true, 0, "Bearer ", 0, 7)) {
             throw tokenSessaoInvalido();
         }
@@ -183,11 +180,11 @@ public class AuthService {
         User user = userRepository.findById(claims.userId())
                 .filter(u -> Boolean.TRUE.equals(u.getActive()))
                 .orElseThrow(this::tokenSessaoInvalido);
-        return UserResponseDTO.from(user);
+        return UsuarioResponseDTO.from(user);
     }
 
     private AuthResponseDTO montarResposta(User user) {
-        return AuthResponseDTO.of(tokenProvider.gerarToken(user), UserResponseDTO.from(user));
+        return AuthResponseDTO.of(tokenProvider.gerarToken(user), UsuarioResponseDTO.from(user));
     }
 
     private void validarSenha(String senha, String confirmaSenha) {

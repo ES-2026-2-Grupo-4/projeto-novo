@@ -9,7 +9,7 @@ public class RegraNegocioException extends RuntimeException {
     private final HttpStatus status;
     private final String codigo;
 
-    public RegraNegocioException(HttpStatus status, String codigo, String mensagem) {
+    public RegraNegocioException(HttpStatus status, String codigo, String mensagem){
         super(mensagem);
         this.status = status;
         this.codigo = codigo;
