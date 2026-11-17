@@ -17,8 +17,8 @@ public record UserResponseDTO(
         OffsetDateTime criadoEm
 ) {
 
-    public static UsuarioResponseDTO from(User user) {
-        return new UsuarioResponseDTO(
+    public static UserResponseDTO from(User user) {
+        return new UserResponseDTO(
                 user.getId(),
                 user.getName(),
                 user.getEmail().address(),
