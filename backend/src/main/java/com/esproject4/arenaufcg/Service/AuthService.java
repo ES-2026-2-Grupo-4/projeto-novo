@@ -22,12 +22,12 @@ import com.esproject4.arenaufcg.Service.security.NotificacaoService;
 import com.esproject4.arenaufcg.Service.security.PasswordHasher;
 import com.esproject4.arenaufcg.Service.security.TokenClaims;
 import com.esproject4.arenaufcg.Service.security.TokenProvider;
-import com.esproject4.arenaufcg.dto.AuthResponseDTO;
-import com.esproject4.arenaufcg.dto.LoginRequestDTO;
-import com.esproject4.arenaufcg.dto.RegisterRequestDTO;
-import com.esproject4.arenaufcg.dto.UsuarioResponseDTO;
-import com.esproject4.arenaufcg.exception.RegraNegocioException;
-import com.esproject4.arenaufcg.repository.UserRepository;
+import com.esproject4.arenaufcg.DTO.auth.LoginRequestDTO;
+import com.esproject4.arenaufcg.DTO.auth.RegisterRequestDTO;
+import com.esproject4.arenaufcg.DTO.UserResponseDTO;
+import com.esproject4.arenaufcg.DTO.auth.AuthResponseDTO;
+import com.esproject4.arenaufcg.Exception.RegraNegocioException;
+import com.esproject4.arenaufcg.Repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -171,7 +171,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public UsuarioResponseDTO getSessionUser(String bearerToken) {
+    public UserResponseDTO getSessionUser(String bearerToken) {
         if (bearerToken == null || !bearerToken.regionMatches(true, 0, "Bearer ", 0, 7)) {
             throw tokenSessaoInvalido();
         }
@@ -180,11 +180,11 @@ public class AuthService {
         User user = userRepository.findById(claims.userId())
                 .filter(u -> Boolean.TRUE.equals(u.getActive()))
                 .orElseThrow(this::tokenSessaoInvalido);
-        return UsuarioResponseDTO.from(user);
+        return UserResponseDTO.from(user);
     }
 
     private AuthResponseDTO montarResposta(User user) {
-        return AuthResponseDTO.of(tokenProvider.gerarToken(user), UsuarioResponseDTO.from(user));
+        return AuthResponseDTO.of(tokenProvider.gerarToken(user), UserResponseDTO.from(user));
     }
 
     private void validarSenha(String senha, String confirmaSenha) {

@@ -16,11 +16,11 @@ import com.esproject4.arenaufcg.DTO.auth.ForgotPasswordRequestDTO;
 import com.esproject4.arenaufcg.DTO.auth.LoginRequestDTO;
 import com.esproject4.arenaufcg.DTO.auth.RegisterRequestDTO;
 import com.esproject4.arenaufcg.DTO.auth.ResetPasswordRequestDTO;
-import com.esproject4.arenaufcg.DTO.auth.UsuarioResponseDTO;
+import com.esproject4.arenaufcg.DTO.UserResponseDTO;
 import com.esproject4.arenaufcg.DTO.auth.VerifyAccountRequestDTO;
 import com.esproject4.arenaufcg.DTO.auth.VerifyAccountResponseDTO;
 import com.esproject4.arenaufcg.DTO.common.MensagemResponseDTO;
-import com.esproject4.arenaufcg.service.AuthService;
+import com.esproject4.arenaufcg.Service.AuthService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,6 @@ public class AuthController {
         return authService.register(dto);
     }
 
-
     @PostMapping("/login")
     public AuthResponseDTO login(@Valid @RequestBody LoginRequestDTO dto) {
         return authService.login(dto);
@@ -52,7 +51,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public UsuarioResponseDTO me(
+    public UserResponseDTO me(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization) {
         return authService.getSessionUser(authorization);
     }

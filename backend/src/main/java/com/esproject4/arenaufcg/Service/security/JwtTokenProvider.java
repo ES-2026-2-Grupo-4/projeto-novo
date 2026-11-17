@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 import com.esproject4.arenaufcg.Model.User;
 import com.esproject4.arenaufcg.Model.UserRole;
 
@@ -27,7 +28,8 @@ public class JwtTokenProvider implements TokenProvider {
     private final long validadeMs;
 
     public JwtTokenProvider(
-            // Em produção, defina app.jwt.secret por variável de ambiente. HS256 exige >= 32 bytes.
+            // Em produção, defina app.jwt.secret por variável de ambiente. HS256 exige >=
+            // 32 bytes.
             @Value("${app.jwt.secret:troque-esta-chave-em-producao-arena-ufcg-jwt-secret-key-0001}") String secret,
             @Value("${app.jwt.expiration-ms:3600000}") long validadeMs) {
         this.chave = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));

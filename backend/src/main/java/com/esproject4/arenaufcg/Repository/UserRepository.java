@@ -1,4 +1,4 @@
-package com.esproject4.arenaufcg.repository;
+package com.esproject4.arenaufcg.Repository;
 
 import java.util.Optional;
 import java.util.UUID;

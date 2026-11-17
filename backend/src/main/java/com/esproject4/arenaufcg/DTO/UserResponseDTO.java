@@ -1,4 +1,4 @@
-package com.esproject4.arenaufcg.dto;
+package com.esproject4.arenaufcg.DTO;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -14,8 +14,7 @@ public record UserResponseDTO(
         String email,
         UserRole perfil,
         boolean verificado,
-        OffsetDateTime criadoEm
-) {
+        OffsetDateTime criadoEm) {
 
     public static UserResponseDTO from(User user) {
         return new UserResponseDTO(
