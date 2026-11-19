@@ -183,7 +183,7 @@ public class Campeonato {
     public void abrirInscricoes() {
         exigirStatus(StatusCampeonato.RASCUNHO, "Só é possível abrir inscrições de um campeonato em rascunho.");
         if (locais.isEmpty()) {
-            throw new RegraNegocioException(HttpStatus.UNPROCESSABLE_CONTENT, "LOCAIS_OBRIGATORIOS",
+            throw new RegraNegocioException(HttpStatus.UNPROCESSABLE_CONTENT, "SEM_LOCAL",
                 "Associe ao menos um local antes de abrir as inscrições.");
         }
         this.status = StatusCampeonato.INSCRICOES_ABERTAS;
