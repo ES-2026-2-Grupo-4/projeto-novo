@@ -1,13 +1,12 @@
 package com.esproject4.arenaufcg.Controller;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,18 +22,20 @@ import jakarta.validation.Valid;
 public class LocalController {
 
     private final LocalService localService;
+    private final UsuarioAutenticado usuarioAutenticado;
 
-    public LocalController(LocalService localService) {
+    public LocalController(LocalService localService, UsuarioAutenticado usuarioAutenticado) {
         this.localService = localService;
+        this.usuarioAutenticado = usuarioAutenticado;
     }
 
     @PostMapping
     public ResponseEntity<LocalResponseDTO> cadastrar(
             @Valid @RequestBody LocalRequestDTO request,
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
         var local = localService.cadastrar(
-            UsuarioAutenticado.exigir(usuarioId),
+            usuarioAutenticado.exigirOrganizadorVerificado(authorization),
             request.nome(),
             request.endereco(),
             request.tipo()
@@ -47,9 +48,9 @@ public class LocalController {
 
     @GetMapping
     public List<LocalResponseDTO> listar(
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
-        UsuarioAutenticado.exigir(usuarioId);
+        usuarioAutenticado.exigirOrganizadorVerificado(authorization);
 
         return localService.listar().stream().map(LocalResponseDTO::de).toList();
     }

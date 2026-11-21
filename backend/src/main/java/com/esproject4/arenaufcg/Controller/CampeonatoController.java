@@ -19,18 +19,20 @@ import jakarta.validation.Valid;
 public class CampeonatoController {
 
     private final CampeonatoService campeonatoService;
+    private final UsuarioAutenticado usuarioAutenticado;
 
-    public CampeonatoController(CampeonatoService campeonatoService) {
+    public CampeonatoController(CampeonatoService campeonatoService, UsuarioAutenticado usuarioAutenticado) {
         this.campeonatoService = campeonatoService;
+        this.usuarioAutenticado = usuarioAutenticado;
     }
 
     @PostMapping
     public ResponseEntity<CampeonatoResponseDTO> criar(
             @Valid @RequestBody CampeonatoRequestDTO request,
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
         var campeonato = campeonatoService.criar(
-            UsuarioAutenticado.exigir(usuarioId),
+            usuarioAutenticado.exigirOrganizadorVerificado(authorization),
             request.nome(),
             request.descricao(),
             request.modalidade(),
@@ -48,9 +50,9 @@ public class CampeonatoController {
 
     @GetMapping("/me")
     public List<CampeonatoResponseDTO> listarMeus(
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+          @RequestHeader(name = "Authorization", required = false) String authorization) {
 
-        return campeonatoService.listarMeus(UsuarioAutenticado.exigir(usuarioId))
+        return campeonatoService.listarMeus(usuarioAutenticado.exigir(authorization))
             .stream()
             .map(CampeonatoResponseDTO::de)
             .toList();
@@ -59,10 +61,10 @@ public class CampeonatoController {
     @GetMapping("/{id}")
     public CampeonatoResponseDTO buscar(
             @PathVariable("id") UUID id,
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
         return CampeonatoResponseDTO.de(
-            campeonatoService.buscar(id, UsuarioAutenticado.exigir(usuarioId))
+            campeonatoService.buscar(id, usuarioAutenticado.exigir(authorization))
         );
     }
 
@@ -70,11 +72,11 @@ public class CampeonatoController {
     public CampeonatoResponseDTO atualizar(
             @PathVariable("id") UUID id,
             @Valid @RequestBody CampeonatoRequestDTO request,
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
         return CampeonatoResponseDTO.de(campeonatoService.atualizar(
             id,
-            UsuarioAutenticado.exigir(usuarioId),
+            usuarioAutenticado.exigir(authorization),
             request.nome(),
             request.descricao(),
             request.modalidade(),
@@ -89,9 +91,9 @@ public class CampeonatoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(
             @PathVariable("id") UUID id,
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
-        campeonatoService.remover(id, UsuarioAutenticado.exigir(usuarioId));
+        campeonatoService.remover(id, usuarioAutenticado.exigir(authorization));
 
         return ResponseEntity.noContent().build();
     }
@@ -99,20 +101,20 @@ public class CampeonatoController {
     @PostMapping("/{id}/open-registrations")
     public CampeonatoResponseDTO abrirInscricoes(
             @PathVariable("id") UUID id,
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
         return CampeonatoResponseDTO.de(
-            campeonatoService.abrirInscricoes(id, UsuarioAutenticado.exigir(usuarioId))
+            campeonatoService.abrirInscricoes(id, usuarioAutenticado.exigir(authorization))
         );
     }
 
     @PostMapping("/{id}/close-registrations")
     public CampeonatoResponseDTO encerrarInscricoes(
             @PathVariable("id") UUID id,
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
         return CampeonatoResponseDTO.de(
-            campeonatoService.encerrarInscricoes(id, UsuarioAutenticado.exigir(usuarioId))
+            campeonatoService.encerrarInscricoes(id, usuarioAutenticado.exigir(authorization))
         );
     }
 
@@ -120,11 +122,11 @@ public class CampeonatoController {
     public CampeonatoResponseDTO definirLocais(
             @PathVariable("id") UUID id,
             @Valid @RequestBody LocaisRequestDTO request,
-            @RequestAttribute(name = UsuarioAutenticado.ATRIBUTO, required = false) UUID usuarioId) {
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
 
         return CampeonatoResponseDTO.de(campeonatoService.definirLocais(
             id,
-            UsuarioAutenticado.exigir(usuarioId),
+            usuarioAutenticado.exigir(authorization),
             request.localIds()
         ));
     }

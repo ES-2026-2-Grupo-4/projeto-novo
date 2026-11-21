@@ -48,4 +48,18 @@ public class ApiExceptionHandler {
             .body(new ErroResponse("CONFLITO_CONCORRENCIA",
                 "O recurso foi alterado por outra operação. Tente novamente."));
     }
+
+    @ExceptionHandler(
+    com.esproject4.arenaufcg.Exception.RegraNegocioException.class
+)
+public ResponseEntity<ErroResponse> tratarRegraAutenticacao(
+        com.esproject4.arenaufcg.Exception.RegraNegocioException exception) {
+
+    return ResponseEntity
+        .status(exception.getStatus())
+        .body(new ErroResponse(
+            exception.getCodigo(),
+            exception.getMessage()
+        ));
+}
 }
