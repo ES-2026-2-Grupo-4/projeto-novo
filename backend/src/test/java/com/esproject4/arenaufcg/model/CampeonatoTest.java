@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 import com.esproject4.arenaufcg.Model.Campeonato;
 import com.esproject4.arenaufcg.Model.Modalidade;
-import com.esproject4.arenaufcg.Service.RegraNegocioException;
+import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

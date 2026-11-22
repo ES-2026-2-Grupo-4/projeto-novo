@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.http.HttpStatus;
 
-import com.esproject4.arenaufcg.Service.RegraNegocioException;
+import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

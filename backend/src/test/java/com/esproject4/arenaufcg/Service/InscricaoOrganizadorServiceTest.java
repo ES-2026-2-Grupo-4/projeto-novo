@@ -72,10 +72,10 @@ class InscricaoOrganizadorServiceTest {
         when(inscricaoRepository.findById(inscricaoId))
             .thenReturn(Optional.of(inscricao));
 
-        RegraNegocioException exception = assertThrows(
-            RegraNegocioException.class,
-            () -> service.aprovar(inscricaoId, organizadorId)
-        );
+        com.esproject4.arenaufcg.Exception.RegraNegocioException exception = assertThrows(
+        com.esproject4.arenaufcg.Exception.RegraNegocioException.class,
+        () -> service.aprovar(inscricaoId, organizadorId)
+    );
 
         assertEquals("VAGAS_ESGOTADAS", exception.getCodigo());
         assertEquals(HttpStatus.UNPROCESSABLE_CONTENT, exception.getStatus());
@@ -104,10 +104,10 @@ class InscricaoOrganizadorServiceTest {
         when(inscricaoRepository.findById(inscricaoId))
             .thenReturn(Optional.of(inscricao));
 
-        RegraNegocioException exception = assertThrows(
-            RegraNegocioException.class,
-            () -> service.aprovar(inscricaoId, outroOrganizadorId)
-        );
+        com.esproject4.arenaufcg.Exception.RegraNegocioException exception = assertThrows(
+        com.esproject4.arenaufcg.Exception.RegraNegocioException.class,
+        () -> service.aprovar(inscricaoId, outroOrganizadorId)
+    );
 
         assertEquals("ACESSO_NEGADO", exception.getCodigo());
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
@@ -121,10 +121,10 @@ class InscricaoOrganizadorServiceTest {
         when(inscricaoRepository.findById(inscricaoId))
             .thenReturn(Optional.of(inscricao));
 
-        RegraNegocioException exception = assertThrows(
-            RegraNegocioException.class,
-            () -> service.recusar(inscricaoId, "", organizadorId)
-        );
+        com.esproject4.arenaufcg.Exception.RegraNegocioException exception = assertThrows(
+        com.esproject4.arenaufcg.Exception.RegraNegocioException.class,
+        () -> service.recusar(inscricaoId, "", organizadorId)
+    );
 
         assertEquals("MOTIVO_OBRIGATORIO", exception.getCodigo());
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());

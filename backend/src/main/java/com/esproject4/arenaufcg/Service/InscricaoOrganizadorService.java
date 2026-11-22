@@ -1,4 +1,5 @@
 package com.esproject4.arenaufcg.Service;
+import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 
 import java.util.UUID;
 
