@@ -1,6 +1,6 @@
 package com.esproject4.arenaufcg.Model;
 
-import com.esproject4.arenaufcg.Service.RegraNegocioException;
+import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 import org.springframework.http.HttpStatus;
 
 import jakarta.persistence.*;
