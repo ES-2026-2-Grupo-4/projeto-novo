@@ -84,6 +84,11 @@ public class Inscricao {
         this.status = StatusInscricao.CANCELADA;
     }
 
+    public void cancelarPeloDirigente(){
+        exigirStatus(StatusInscricao.PENDENTE);
+        this.status = StatusInscricao.CANCELADA;
+    }
+
     public void remover(String motivo){
         exigirMotivo(motivo);
         exigirStatus(StatusInscricao.APROVADA);
@@ -98,7 +103,7 @@ public class Inscricao {
 
     public void exigirStatus(StatusInscricao esperando){
         if(status != esperando){
-            throw new RegraNegocioException(HttpStatus.CONFLICT, "TRANSICAO_INVALIDA", "A inscrição está" + status + "e não permite esta ação.");
+            throw new RegraNegocioException(HttpStatus.CONFLICT, "TRANSICAO_INVALIDA", "A inscrição está " + status + " e não permite esta ação.");
         }
     }
 
@@ -151,8 +156,4 @@ public class Inscricao {
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
-
-    
-
-
 }
