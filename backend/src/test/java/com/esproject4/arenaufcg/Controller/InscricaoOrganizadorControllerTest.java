@@ -1,6 +1,9 @@
 package com.esproject4.arenaufcg.Controller;
 
 import com.esproject4.arenaufcg.DTO.InscricaoResponseDTO;
+import com.esproject4.arenaufcg.DTO.UserResponseDTO;
+import com.esproject4.arenaufcg.Model.UserRole;
+import com.esproject4.arenaufcg.Service.AuthService;
 import com.esproject4.arenaufcg.Model.StatusInscricao;
 import com.esproject4.arenaufcg.Service.InscricaoOrganizadorService;
 
@@ -36,6 +39,11 @@ class InscricaoOrganizadorControllerTest {
     @Mock
     private InscricaoOrganizadorService service;
 
+    @Mock
+    private AuthService authService;
+
+    private static final String TOKEN = "Bearer token-teste";
+
     private MockMvc mockMvc;
 
     private UUID inscricaoId;
@@ -47,13 +55,18 @@ class InscricaoOrganizadorControllerTest {
         validator.afterPropertiesSet();
 
         mockMvc = MockMvcBuilders
-            .standaloneSetup(new InscricaoOrganizadorController(service))
+            .standaloneSetup(new InscricaoOrganizadorController(service, authService))
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .setValidator(validator)
             .build();
 
         inscricaoId = UUID.randomUUID();
         organizadorId = UUID.randomUUID();
+
+        // O controller descobre o usuário pelo token (login da T02).
+        lenient().when(authService.getSessionUser(TOKEN)).thenReturn(
+            new UserResponseDTO(organizadorId, "Organizador", "org@ufcg.edu.br",
+                                UserRole.ORGANIZADOR, true, OffsetDateTime.now()));
     }
 
     // Método auxiliar para criar DTOs de resposta
@@ -87,8 +100,8 @@ class InscricaoOrganizadorControllerTest {
             .thenReturn(resposta);
 
         mockMvc.perform(
-            post("/api/v1/inscricoes/{id}/aprovacao", inscricaoId)
-                .header("X-Usuario-Id", organizadorId.toString())
+            post("/api/v1/registrations/{id}/approve", inscricaoId)
+                .header("Authorization", TOKEN)
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(inscricaoId.toString()))
@@ -114,11 +127,11 @@ class InscricaoOrganizadorControllerTest {
         )).thenReturn(pagina);
 
         mockMvc.perform(
-            get("/api/v1/campeonatos/{campeonatoId}/inscricoes", campeonatoId)
+            get("/api/v1/championships/{campeonatoId}/registrations", campeonatoId)
                 .param("status", "PENDENTE")
                 .param("page", "1")
                 .param("size", "10")
-                .header("X-Usuario-Id", organizadorId.toString())
+                .header("Authorization", TOKEN)
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content").isArray())
@@ -157,8 +170,8 @@ class InscricaoOrganizadorControllerTest {
         )).thenReturn(pagina);
 
         mockMvc.perform(
-            get("/api/v1/campeonatos/{campeonatoId}/inscricoes", campeonatoId)
-                .header("X-Usuario-Id", organizadorId.toString())
+            get("/api/v1/championships/{campeonatoId}/registrations", campeonatoId)
+                .header("Authorization", TOKEN)
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content").isArray())
@@ -193,8 +206,8 @@ class InscricaoOrganizadorControllerTest {
             .thenReturn(resposta);
 
         mockMvc.perform(
-            post("/api/v1/inscricoes/{id}/recusa", inscricaoId)
-                .header("X-Usuario-Id", organizadorId.toString())
+            post("/api/v1/registrations/{id}/reject", inscricaoId)
+                .header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"motivo\":\"Documentação incompleta\"}")
         )
@@ -218,8 +231,8 @@ class InscricaoOrganizadorControllerTest {
             .thenReturn(resposta);
 
         mockMvc.perform(
-            post("/api/v1/inscricoes/{id}/remocao", inscricaoId)
-                .header("X-Usuario-Id", organizadorId.toString())
+            post("/api/v1/registrations/{id}/remove", inscricaoId)
+                .header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"motivo\":\"Descumprimento das regras\"}")
         )
@@ -235,8 +248,8 @@ class InscricaoOrganizadorControllerTest {
     @Test
     void naoDeveRecusarInscricaoSemMotivo() throws Exception {
         mockMvc.perform(
-            post("/api/v1/inscricoes/{id}/recusa", inscricaoId)
-                .header("X-Usuario-Id", organizadorId.toString())
+            post("/api/v1/registrations/{id}/reject", inscricaoId)
+                .header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"motivo\":\"\"}")
         )
@@ -250,8 +263,8 @@ class InscricaoOrganizadorControllerTest {
     @Test
     void naoDeveRemoverInscricaoSemMotivo() throws Exception {
         mockMvc.perform(
-            post("/api/v1/inscricoes/{id}/remocao", inscricaoId)
-                .header("X-Usuario-Id", organizadorId.toString())
+            post("/api/v1/registrations/{id}/remove", inscricaoId)
+                .header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"motivo\":\"   \"}")
         )
@@ -267,8 +280,8 @@ class InscricaoOrganizadorControllerTest {
         String motivo = "A".repeat(501);
 
         mockMvc.perform(
-            post("/api/v1/inscricoes/{id}/recusa", inscricaoId)
-                .header("X-Usuario-Id", organizadorId.toString())
+            post("/api/v1/registrations/{id}/reject", inscricaoId)
+                .header("Authorization", TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"motivo\":\"" + motivo + "\"}")
         )

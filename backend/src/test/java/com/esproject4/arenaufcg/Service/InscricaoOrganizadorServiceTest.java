@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,10 +41,8 @@ class InscricaoOrganizadorServiceTest {
         inscricaoId = UUID.randomUUID();
 
         campeonato = new Campeonato(
-            "Campeonato Universitário",
-            Modalidade.FUTSAL,
-            4,
-            organizadorId
+            "Campeonato Universitário", null, Modalidade.FUTSAL, FormatoDisputa.PONTOS_CORRIDOS,
+            null, 4, LocalDate.now().plusDays(10), LocalDate.now().plusDays(40), organizadorId
         );
 
         Time time = mock(Time.class);
@@ -72,8 +71,10 @@ class InscricaoOrganizadorServiceTest {
         when(inscricaoRepository.findById(inscricaoId))
             .thenReturn(Optional.of(inscricao));
 
-        com.esproject4.arenaufcg.Exception.RegraNegocioException exception = assertThrows(
-        com.esproject4.arenaufcg.Exception.RegraNegocioException.class,
+        // O Campeonato do master (T04) lança a exceção da pasta Service.
+        // Provisório: volta para a da pasta Exception quando o gerente unificar as duas.
+        com.esproject4.arenaufcg.Service.RegraNegocioException exception = assertThrows(
+        com.esproject4.arenaufcg.Service.RegraNegocioException.class,
         () -> service.aprovar(inscricaoId, organizadorId)
     );
 

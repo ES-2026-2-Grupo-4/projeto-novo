@@ -1,4 +1,5 @@
 package com.esproject4.arenaufcg.Service;
+
 import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 
 import java.util.UUID;
@@ -34,8 +35,8 @@ public class InscricaoOrganizadorService {
     public InscricaoResponseDTO aprovar(UUID inscricaoId, UUID usuarioAtualId) {
         Inscricao inscricao = buscarInscricaoAutorizada(inscricaoId, usuarioAtualId);
 
-        inscricao.aprovar(usuarioAtualId);
         inscricao.getCampeonato().reservarVaga();
+        inscricao.aprovar(usuarioAtualId);
 
         return InscricaoResponseDTO.de(inscricao);
     }
@@ -43,6 +44,12 @@ public class InscricaoOrganizadorService {
     @Transactional
     public InscricaoResponseDTO recusar(UUID inscricaoId, String motivo, UUID usuarioAtualId) {
         Inscricao inscricao = buscarInscricaoAutorizada(inscricaoId, usuarioAtualId);
+        if (inscricao.getCampeonato().jaIniciou()) {
+            throw new RegraNegocioException(
+                    HttpStatus.UNPROCESSABLE_CONTENT,
+                    "CAMPEONATO_INICIADO",
+                    "Não é possível remover um time depois do início do campeonato.");
+        }
 
         inscricao.recusar(motivo, usuarioAtualId);
 
@@ -73,12 +80,10 @@ public class InscricaoOrganizadorService {
 
         if (status != null) {
             inscricoes = inscricaoRepository.findByCampeonatoIdAndStatus(
-                campeonatoId, status, pageable
-            );
+                    campeonatoId, status, pageable);
         } else {
             inscricoes = inscricaoRepository.findByCampeonatoId(
-                campeonatoId, pageable
-            );
+                    campeonatoId, pageable);
         }
 
         return inscricoes.map(InscricaoResponseDTO::de);
@@ -89,11 +94,10 @@ public class InscricaoOrganizadorService {
     // Busca a inscrição e verifica se o usuário atual é o organizador do campeonato
     private Inscricao buscarInscricaoAutorizada(UUID inscricaoId, UUID usuarioAtualId) {
         Inscricao inscricao = inscricaoRepository.findById(inscricaoId)
-            .orElseThrow(() -> new RegraNegocioException(
-                HttpStatus.NOT_FOUND,
-                "NAO_ENCONTRADO",
-                "Inscrição não encontrada."
-            ));
+                .orElseThrow(() -> new RegraNegocioException(
+                        HttpStatus.NOT_FOUND,
+                        "NAO_ENCONTRADO",
+                        "Inscrição não encontrada."));
 
         verificarOrganizador(inscricao.getCampeonato(), usuarioAtualId);
 
@@ -103,21 +107,19 @@ public class InscricaoOrganizadorService {
     // Busca o campeonato pelo ID e lança exceção se não encontrado
     private Campeonato buscarCampeonato(UUID campeonatoId) {
         return campeonatoRepository.findById(campeonatoId)
-            .orElseThrow(() -> new RegraNegocioException(
-                HttpStatus.NOT_FOUND,
-                "NAO_ENCONTRADO",
-                "Campeonato não encontrado."
-            ));
+                .orElseThrow(() -> new RegraNegocioException(
+                        HttpStatus.NOT_FOUND,
+                        "NAO_ENCONTRADO",
+                        "Campeonato não encontrado."));
     }
 
     // Verifica se o usuário atual é o organizador do campeonato
     private void verificarOrganizador(Campeonato campeonato, UUID usuarioAtualId) {
         if (usuarioAtualId == null || !usuarioAtualId.equals(campeonato.getOrganizadorId())) {
             throw new RegraNegocioException(
-                HttpStatus.FORBIDDEN,
-                "ACESSO_NEGADO",
-                "Somente o organizador do campeonato pode realizar esta operação."
-            );
+                    HttpStatus.FORBIDDEN,
+                    "ACESSO_NEGADO",
+                    "Somente o organizador do campeonato pode realizar esta operação.");
         }
     }
 }

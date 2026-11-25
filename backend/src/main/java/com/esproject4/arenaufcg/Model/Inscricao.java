@@ -53,7 +53,7 @@ public class Inscricao {
     @CreationTimestamp @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 
-    @UpdateTimestamp @Column(name = "update_at")
+    @UpdateTimestamp @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
     protected Inscricao(){}
@@ -79,10 +79,6 @@ public class Inscricao {
         registrarDecisao(organizadorId);
     }
 
-    public void cancelar(){
-        exigirStatus(StatusInscricao.APROVADA);
-        this.status = StatusInscricao.CANCELADA;
-    }
 
     public void cancelarPeloDirigente(){
         exigirStatus(StatusInscricao.PENDENTE);

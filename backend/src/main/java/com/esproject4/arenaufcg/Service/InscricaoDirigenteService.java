@@ -44,7 +44,7 @@ public class InscricaoDirigenteService {
 
         verificarDirigente(time, dirigenteId);
 
-        if (!campeonato.aceitarInscricoes()) {
+        if (!campeonato.aceitaInscricoes()) {
             throw new RegraNegocioException(
                     HttpStatus.UNPROCESSABLE_CONTENT,
                     "INSCRICOES_FECHADAS",

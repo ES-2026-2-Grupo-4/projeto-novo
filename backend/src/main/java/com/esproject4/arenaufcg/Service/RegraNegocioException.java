@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 public class RegraNegocioException extends RuntimeException {
     private final HttpStatus status;
     private final String codigo;
-    
+
     public RegraNegocioException(HttpStatus status, String codigo, String mensagem) {
         super(mensagem);
         this.status = status;
@@ -20,5 +20,5 @@ public class RegraNegocioException extends RuntimeException {
         return status;
     }
 
-        
+
 }

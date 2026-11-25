@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,12 +50,12 @@ public class InscricaoDirigenteServiceTest {
         campeonatoId = UUID.randomUUID();
         timeId = UUID.randomUUID();
 
-        campeonato = new Campeonato(
-                "Campeonato Universitario",
-                Modalidade.FUTSAL,
-                4,
-                UUID.randomUUID()
-        );
+        // No master, um campeonato novo começa em RASCUNHO; o spy finge inscrições abertas.
+        campeonato = spy(new Campeonato(
+                "Campeonato Universitario", null, Modalidade.FUTSAL, FormatoDisputa.PONTOS_CORRIDOS,
+                null, 4, LocalDate.now().plusDays(10), LocalDate.now().plusDays(40), UUID.randomUUID()
+        ));
+        lenient().doReturn(true).when(campeonato).aceitaInscricoes();
 
         time = new Time(
                 "Time Universitario",
@@ -114,7 +115,7 @@ public class InscricaoDirigenteServiceTest {
         when(timeRepository.findById(timeId))
                 .thenReturn(Optional.of(time));
 
-        when(campeonatoFechado.aceitarInscricoes())
+        when(campeonatoFechado.aceitaInscricoes())
                 .thenReturn(false);
 
         RegraNegocioException exception = assertThrows(
@@ -140,12 +141,11 @@ public class InscricaoDirigenteServiceTest {
     @Test
     void naoDeveSolicitarInscricaoComModalidadeDiferente() {
 
-        Campeonato campeonatoVolei = new Campeonato(
-                "Campeonato de Volei",
-                Modalidade.VOLEI,
-                4,
-                UUID.randomUUID()
-        );
+        Campeonato campeonatoVolei = spy(new Campeonato(
+                "Campeonato de Volei", null, Modalidade.VOLEI, FormatoDisputa.PONTOS_CORRIDOS,
+                null, 4, LocalDate.now().plusDays(10), LocalDate.now().plusDays(40), UUID.randomUUID()
+        ));
+        lenient().doReturn(true).when(campeonatoVolei).aceitaInscricoes();
 
         when(campeonatoRepository.findById(campeonatoId))
                 .thenReturn(Optional.of(campeonatoVolei));
