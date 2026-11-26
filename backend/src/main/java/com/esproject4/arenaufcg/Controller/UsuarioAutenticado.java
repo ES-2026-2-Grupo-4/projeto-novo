@@ -56,4 +56,18 @@ public class UsuarioAutenticado {
             );
         }
     }
+
+    public UUID exigirAdmin(String authorization) {
+        UserResponseDTO usuario = authService.getSessionUser(authorization);
+
+        if (usuario.perfil() != UserRole.ADMIN) {
+            throw new RegraNegocioException(
+                HttpStatus.FORBIDDEN,
+                "ACESSO_NEGADO",
+                "Esta operação é exclusiva de administradores."
+            );
+        }
+
+        return usuario.id();
+    }
 }
