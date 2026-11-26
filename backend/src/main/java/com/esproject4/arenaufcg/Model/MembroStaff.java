@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.http.HttpStatus;
 
-import com.esproject4.arenaufcg.Service.RegraNegocioException;
+import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 
 import jakarta.persistence.*;
 
@@ -20,9 +20,9 @@ public class MembroStaff {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    // FK para teams(id). Fica como UUID enquanto a entidade Time (T05) não estiver na master.
-    @Column(name = "team_id", nullable = false, updatable = false)
-    private UUID timeId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "team_id", nullable = false, updatable = false)
+    private Time time;
 
     @Column(name = "name", length = 120, nullable = false)
     private String nome;
@@ -45,13 +45,13 @@ public class MembroStaff {
 
     protected MembroStaff() {}
 
-    public MembroStaff(UUID timeId, String nome, FuncaoStaff funcao) {
-        if (timeId == null) {
+    public MembroStaff(Time time, String nome, FuncaoStaff funcao) {
+        if (time == null) {
             throw dadosInvalidos("O time é obrigatório.");
         }
         validar(nome, funcao);
 
-        this.timeId = timeId;
+        this.time = time;
         this.nome = nome;
         this.funcao = funcao;
         this.ativo = true;
@@ -69,7 +69,8 @@ public class MembroStaff {
     }
 
     public boolean pertenceAoTime(UUID timeId) {
-        return this.timeId != null && this.timeId.equals(timeId);
+        return this.time != null && this.time.getId() != null
+                && this.time.getId().equals(timeId);
     }
 
     private static void validar(String nome, FuncaoStaff funcao) {
@@ -89,8 +90,12 @@ public class MembroStaff {
         return id;
     }
 
+    public Time getTime() {
+        return time;
+    }
+
     public UUID getTimeId() {
-        return timeId;
+        return time.getId();
     }
 
     public String getNome() {
