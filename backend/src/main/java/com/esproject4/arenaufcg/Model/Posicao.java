@@ -31,9 +31,6 @@ public enum Posicao {
 
     private final List<Modalidade> modalidades;
 
-
-//aqui eu pesquisei sobre, e vi que o ideal é usar Varargs, que basicamente serve para 
-//passar uma ou várias modalidades sem criar um array manualmente.
     Posicao(Modalidade... modalidades) { 
         this.modalidades = Arrays.asList(modalidades);
     }
