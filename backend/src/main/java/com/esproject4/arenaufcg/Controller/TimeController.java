@@ -5,7 +5,9 @@ import com.esproject4.arenaufcg.DTO.EditarTimeRequest;
 import com.esproject4.arenaufcg.DTO.TimeResponse;
 import com.esproject4.arenaufcg.DTO.UserResponseDTO;
 import com.esproject4.arenaufcg.Exception.RegraNegocioException;
+import com.esproject4.arenaufcg.Model.PermissaoSistema;
 import com.esproject4.arenaufcg.Model.UserRole;
+import com.esproject4.arenaufcg.Security.RequerPermissao;
 import com.esproject4.arenaufcg.Service.AuthService;
 import com.esproject4.arenaufcg.Service.TimeService;
 import jakarta.validation.Valid;
@@ -37,6 +39,13 @@ public class TimeController {
     }
 
     // POST /api/v1/teams - cadastro de time (HU-01)
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_DIRIGENTE_ACESSO,
+            PermissaoSistema.TIME_GERENCIAR
+        },
+        acao = "TIME_CRIAR"
+    )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TimeResponse criar(
@@ -48,6 +57,12 @@ public class TimeController {
     }
 
     // GET /api/v1/teams/me - times do dirigente logado
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_DIRIGENTE_ACESSO,
+            PermissaoSistema.TIME_GERENCIAR
+        }
+    )
     @GetMapping("/me")
     public List<TimeResponse> meusTimes(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
@@ -57,6 +72,13 @@ public class TimeController {
     }
 
     // PUT /api/v1/teams/{teamId} - edição de nome e sigla (HU-02)
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_DIRIGENTE_ACESSO,
+            PermissaoSistema.TIME_GERENCIAR
+        },
+        acao = "TIME_EDITAR"
+    )
     @PutMapping("/{teamId}")
     public TimeResponse editar(
             @PathVariable UUID teamId,

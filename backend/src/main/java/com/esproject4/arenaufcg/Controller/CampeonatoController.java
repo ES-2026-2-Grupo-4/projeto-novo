@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import com.esproject4.arenaufcg.DTO.CampeonatoRequestDTO;
 import com.esproject4.arenaufcg.DTO.CampeonatoResponseDTO;
 import com.esproject4.arenaufcg.DTO.LocaisRequestDTO;
+import com.esproject4.arenaufcg.Model.PermissaoSistema;
+import com.esproject4.arenaufcg.Security.RequerPermissao;
 import com.esproject4.arenaufcg.Service.CampeonatoService;
+
 
 import jakarta.validation.Valid;
 
@@ -26,6 +29,13 @@ public class CampeonatoController {
         this.usuarioAutenticado = usuarioAutenticado;
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.CAMPEONATO_CRIAR
+        },
+        acao = "CAMPEONATO_CRIAR"
+    )
     @PostMapping
     public ResponseEntity<CampeonatoResponseDTO> criar(
             @Valid @RequestBody CampeonatoRequestDTO request,
@@ -48,6 +58,12 @@ public class CampeonatoController {
             .body(CampeonatoResponseDTO.de(campeonato));
     }
 
+     @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.CAMPEONATO_GERENCIAR
+        }
+    )
     @GetMapping("/me")
     public List<CampeonatoResponseDTO> listarMeus(
           @RequestHeader(name = "Authorization", required = false) String authorization) {
@@ -58,6 +74,12 @@ public class CampeonatoController {
             .toList();
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.CAMPEONATO_GERENCIAR
+        }
+    )
     @GetMapping("/{id}")
     public CampeonatoResponseDTO buscar(
             @PathVariable("id") UUID id,
@@ -68,6 +90,13 @@ public class CampeonatoController {
         );
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.CAMPEONATO_GERENCIAR
+        },
+        acao = "CAMPEONATO_ATUALIZAR"
+    )
     @PutMapping("/{id}")
     public CampeonatoResponseDTO atualizar(
             @PathVariable("id") UUID id,
@@ -88,6 +117,13 @@ public class CampeonatoController {
         ));
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.CAMPEONATO_GERENCIAR
+        },
+        acao = "CAMPEONATO_REMOVER"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(
             @PathVariable("id") UUID id,
@@ -98,6 +134,13 @@ public class CampeonatoController {
         return ResponseEntity.noContent().build();
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.CAMPEONATO_GERENCIAR
+        },
+        acao = "INSCRICOES_ABRIR"
+    )
     @PostMapping("/{id}/open-registrations")
     public CampeonatoResponseDTO abrirInscricoes(
             @PathVariable("id") UUID id,
@@ -108,6 +151,13 @@ public class CampeonatoController {
         );
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.CAMPEONATO_GERENCIAR
+        },
+        acao = "INSCRICOES_ENCERRAR"
+    )
     @PostMapping("/{id}/close-registrations")
     public CampeonatoResponseDTO encerrarInscricoes(
             @PathVariable("id") UUID id,
@@ -118,6 +168,13 @@ public class CampeonatoController {
         );
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.CAMPEONATO_GERENCIAR
+        },
+        acao = "CAMPEONATO_DEFINIR_LOCAIS"
+    )
     @PutMapping("/{id}/venues")
     public CampeonatoResponseDTO definirLocais(
             @PathVariable("id") UUID id,

@@ -13,6 +13,8 @@ import com.esproject4.arenaufcg.DTO.common.PaginaResponseDTO;
 import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 import com.esproject4.arenaufcg.Model.UserRole;
 import com.esproject4.arenaufcg.Service.AuditoriaService;
+import com.esproject4.arenaufcg.Model.PermissaoSistema;
+import com.esproject4.arenaufcg.Security.RequerPermissao;
 
 @RestController
 @RequestMapping("/api/v1/admin/audit-logs")
@@ -29,6 +31,13 @@ public class AuditoriaController {
         this.usuarioAutenticado = usuarioAutenticado;
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ADMIN_ACESSO,
+            PermissaoSistema.VISUALIZAR_LOGS
+        },
+        somenteAdmin = true
+    )
     @GetMapping
     public ResponseEntity<PaginaResponseDTO<LogAuditoriaResponseDTO>> consultarLogs(
             @RequestHeader(value = "Authorization", required = false) String authorization,

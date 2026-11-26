@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.esproject4.arenaufcg.DTO.LocalRequestDTO;
 import com.esproject4.arenaufcg.DTO.LocalResponseDTO;
+import com.esproject4.arenaufcg.Model.PermissaoSistema;
+import com.esproject4.arenaufcg.Security.RequerPermissao;
 import com.esproject4.arenaufcg.Service.LocalService;
 
 import jakarta.validation.Valid;
@@ -29,6 +31,13 @@ public class LocalController {
         this.usuarioAutenticado = usuarioAutenticado;
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.LOCAL_CADASTRAR
+        },
+        acao = "LOCAL_CADASTRAR"
+    )
     @PostMapping
     public ResponseEntity<LocalResponseDTO> cadastrar(
             @Valid @RequestBody LocalRequestDTO request,
@@ -46,6 +55,11 @@ public class LocalController {
             .body(LocalResponseDTO.de(local));
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO
+        }
+    )
     @GetMapping
     public List<LocalResponseDTO> listar(
             @RequestHeader(name = "Authorization", required = false) String authorization) {
