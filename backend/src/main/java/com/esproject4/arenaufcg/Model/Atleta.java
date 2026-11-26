@@ -9,7 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.http.HttpStatus;
 
-import com.esproject4.arenaufcg.Service.RegraNegocioException;
+import com.esproject4.arenaufcg.Exception.RegraNegocioException;
 
 import jakarta.persistence.*;
 
@@ -21,9 +21,9 @@ public class Atleta {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    // FK para teams(id). Fica como UUID enquanto a entidade Time (T05) não estiver na master.
-    @Column(name = "team_id", nullable = false, updatable = false)
-    private UUID timeId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "team_id", nullable = false, updatable = false)
+    private Time time;
 
     @Column(name = "name", length = 120, nullable = false)
     private String nome;
@@ -52,14 +52,15 @@ public class Atleta {
 
     protected Atleta() {}
 
-    public Atleta(UUID timeId, String nome, String apelido, LocalDate dataNascimento,
+    public Atleta(Time time, String nome, String apelido, LocalDate dataNascimento,
                   Posicao posicaoPreferida) {
-        if (timeId == null) {
+        if (time == null) {
             throw dadosInvalidos("O time é obrigatório.");
         }
         validarNome(nome);
+        validarPosicao(time, posicaoPreferida);
 
-        this.timeId = timeId;
+        this.time = time;
         this.nome = nome;
         this.apelido = apelido;
         this.dataNascimento = dataNascimento;
@@ -67,10 +68,10 @@ public class Atleta {
         this.ativo = true;
     }
 
-    
     public void atualizar(String nome, String apelido, LocalDate dataNascimento,
                           Posicao posicaoPreferida) {
         validarNome(nome);
+        validarPosicao(this.time, posicaoPreferida);
 
         this.nome = nome;
         this.apelido = apelido;
@@ -83,7 +84,8 @@ public class Atleta {
     }
 
     public boolean pertenceAoTime(UUID timeId) {
-        return this.timeId != null && this.timeId.equals(timeId);
+        return this.time != null && this.time.getId() != null
+                && this.time.getId().equals(timeId);
     }
 
     private static void validarNome(String nome) {
@@ -92,18 +94,27 @@ public class Atleta {
         }
     }
 
+    private static void validarPosicao(Time time, Posicao posicao) {
+        if (posicao != null && !posicao.aceita(time.getModalidade())) {
+            throw new RegraNegocioException(HttpStatus.UNPROCESSABLE_CONTENT, "POSICAO_INVALIDA",
+                    "A posição não é da modalidade do time.");
+        }
+    }
+
     private static RegraNegocioException dadosInvalidos(String mensagem) {
         return new RegraNegocioException(HttpStatus.BAD_REQUEST, "DADOS_INVALIDOS", mensagem);
     }
-
-    // ---------- Getters ----------
 
     public UUID getId() {
         return id;
     }
 
+    public Time getTime() {
+        return time;
+    }
+
     public UUID getTimeId() {
-        return timeId;
+        return time.getId();
     }
 
     public String getNome() {
