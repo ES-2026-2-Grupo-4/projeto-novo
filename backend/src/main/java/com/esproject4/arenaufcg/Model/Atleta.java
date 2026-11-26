@@ -17,6 +17,8 @@ import jakarta.persistence.*;
 @Table(name = "athletes")
 public class Atleta {
 
+    public static final int TAMANHO_MAX_NOME = 120;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -25,7 +27,7 @@ public class Atleta {
     @JoinColumn(name = "team_id", nullable = false, updatable = false)
     private Time time;
 
-    @Column(name = "name", length = 120, nullable = false)
+    @Column(name = "name", length = TAMANHO_MAX_NOME, nullable = false)
     private String nome;
 
     @Column(name = "nickname", length = 60)
@@ -91,6 +93,9 @@ public class Atleta {
     private static void validarNome(String nome) {
         if (nome == null || nome.isBlank()) {
             throw dadosInvalidos("O nome do atleta é obrigatório.");
+        }
+        if (nome.length() > TAMANHO_MAX_NOME) {
+            throw dadosInvalidos("O nome do atleta deve ter no máximo " + TAMANHO_MAX_NOME + " caracteres.");
         }
     }
 
