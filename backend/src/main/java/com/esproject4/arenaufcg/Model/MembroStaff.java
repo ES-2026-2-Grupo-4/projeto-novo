@@ -16,6 +16,8 @@ import jakarta.persistence.*;
 @Table(name = "staff_members")
 public class MembroStaff {
 
+    public static final int TAMANHO_MAX_NOME = 120;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -24,7 +26,7 @@ public class MembroStaff {
     @JoinColumn(name = "team_id", nullable = false, updatable = false)
     private Time time;
 
-    @Column(name = "name", length = 120, nullable = false)
+    @Column(name = "name", length = TAMANHO_MAX_NOME, nullable = false)
     private String nome;
 
     @Enumerated(EnumType.STRING)
@@ -76,6 +78,9 @@ public class MembroStaff {
     private static void validar(String nome, FuncaoStaff funcao) {
         if (nome == null || nome.isBlank()) {
             throw dadosInvalidos("O nome do membro do staff é obrigatório.");
+        }
+        if (nome.length() > TAMANHO_MAX_NOME) {
+            throw dadosInvalidos("O nome do membro do staff deve ter no máximo " + TAMANHO_MAX_NOME + " caracteres.");
         }
         if (funcao == null) {
             throw dadosInvalidos("A função do membro do staff é obrigatória.");
