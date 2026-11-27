@@ -96,4 +96,24 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     @JsonProperty("updatedAt")
     private OffsetDateTime updatedAt;
+
+    public static User criarAdministradorViaCli(
+        String nome,
+        Email email,
+        String senhaHash) {
+
+        return User.builder()
+            .name(nome)
+            .email(email)
+            .password(senhaHash)
+            .role(UserRole.ADMIN)
+            .verified(true)
+            .active(true)
+            .acceptedTerms(true)
+            .build();
+    }
+
+    public void desativar() {
+        this.active = false;
+    }
 }
