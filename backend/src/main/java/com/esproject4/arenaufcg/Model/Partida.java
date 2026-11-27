@@ -81,6 +81,24 @@ public class Partida {
         this.status = StatusPartida.AGENDADA;
     }
 
+	// Define o local de mando desta partida (HU-16). Só pode mudar enquanto a partida
+	// está AGENDADA — depois de começar/encerrar/cancelar, o local está congelado.
+	// Não valida se o local pertence ao campeonato: isso é papel do MandoService
+	// (que tem acesso ao Campeonato.getLocais).
+	public void definirLocal(UUID localId) {
+		if (localId == null) {
+			throw dadosInvalidos("O local é obrigatório.");
+		}
+		if (status != StatusPartida.AGENDADA) {
+			throw new RegraNegocioException(
+					HttpStatus.CONFLICT,
+					"PARTIDA_NAO_EDITAVEL",
+					"O local só pode ser definido enquanto a partida está agendada."
+					);
+		}
+		this.localId = localId;
+	}
+
     // true se o time é o mandante ou o visitante desta partida.
     public boolean participa(UUID timeId) {
         return ehMandante(timeId) || ehVisitante(timeId);
