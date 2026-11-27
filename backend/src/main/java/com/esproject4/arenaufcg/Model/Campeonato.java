@@ -27,6 +27,11 @@ public class Campeonato {
     public static final int MIN_TIMES = 2;
     public static final int MAX_TIMES = 64;
 
+    public static final int NUMERO_MINIMO_PADRAO = 1;
+    public static final int NUMERO_MAXIMO_PADRAO = 99;
+    public static final int NUMERO_LIMITE_INFERIOR = 0;
+    public static final int NUMERO_LIMITE_SUPERIOR = 99;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -57,6 +62,16 @@ public class Campeonato {
     @ColumnDefault("0")
     @Column(name = "occupied_slots", nullable = false)
     private int vagasOcupadas;
+
+    @JdbcTypeCode(SqlTypes.SMALLINT)
+    @ColumnDefault("1")
+    @Column(name = "min_number", nullable = false)
+    private int numeroMinimo = NUMERO_MINIMO_PADRAO;
+
+    @JdbcTypeCode(SqlTypes.SMALLINT)
+    @ColumnDefault("99")
+    @Column(name = "max_number", nullable = false)
+    private int numeroMaximo = NUMERO_MAXIMO_PADRAO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 30, nullable = false, columnDefinition = "VARCHAR(30)")
@@ -166,7 +181,25 @@ public class Campeonato {
         this.dataFim = dataFim;
     }
 
-    /** Substitui a lista de locais do campeonato. Não é permitido depois do início. */
+    public void definirFaixaNumeros(Integer minimo, Integer maximo) {
+        int novoMinimo = minimo != null ? minimo : this.numeroMinimo;
+        int novoMaximo = maximo != null ? maximo : this.numeroMaximo;
+        validarFaixaNumeros(novoMinimo, novoMaximo);
+
+        if (status != StatusCampeonato.RASCUNHO
+                && (novoMinimo != this.numeroMinimo || novoMaximo != this.numeroMaximo)) {
+            throw new RegraNegocioException(HttpStatus.UNPROCESSABLE_CONTENT, "CAMPO_BLOQUEADO",
+                "A faixa de números não pode mudar depois que as inscrições foram abertas.");
+        }
+
+        this.numeroMinimo = novoMinimo;
+        this.numeroMaximo = novoMaximo;
+    }
+
+    public boolean numeroPermitido(int numero) {
+        return numero >= numeroMinimo && numero <= numeroMaximo;
+    }
+
     public void definirLocais(Collection<Local> novosLocais) {
         if (jaIniciou()) {
             throw new RegraNegocioException(HttpStatus.UNPROCESSABLE_CONTENT, "CAMPEONATO_INICIADO",
@@ -281,10 +314,25 @@ public class Campeonato {
         }
     }
 
+    private static void validarFaixaNumeros(int minimo, int maximo) {
+        if (minimo < NUMERO_LIMITE_INFERIOR || minimo > NUMERO_LIMITE_SUPERIOR
+                || maximo < NUMERO_LIMITE_INFERIOR || maximo > NUMERO_LIMITE_SUPERIOR) {
+            throw faixaInvalida("A faixa de números deve estar entre " + NUMERO_LIMITE_INFERIOR
+                + " e " + NUMERO_LIMITE_SUPERIOR + ".");
+        }
+        if (minimo > maximo) {
+            throw faixaInvalida("O número mínimo não pode ser maior que o número máximo.");
+        }
+    }
+
     private void exigirStatus(StatusCampeonato esperado, String mensagem) {
         if (this.status != esperado) {
             throw new RegraNegocioException(HttpStatus.CONFLICT, "TRANSICAO_INVALIDA", mensagem);
         }
+    }
+
+    private static RegraNegocioException faixaInvalida(String mensagem) {
+        return new RegraNegocioException(HttpStatus.BAD_REQUEST, "FAIXA_DE_NUMEROS_INVALIDA", mensagem);
     }
 
     private static RegraNegocioException dadosInvalidos(String mensagem) {
@@ -323,6 +371,14 @@ public class Campeonato {
 
     public int getVagasOcupadas() {
         return vagasOcupadas;
+    }
+
+    public int getNumeroMinimo() {
+        return numeroMinimo;
+    }
+
+    public int getNumeroMaximo() {
+        return numeroMaximo;
     }
 
     public StatusCampeonato getStatus() {
