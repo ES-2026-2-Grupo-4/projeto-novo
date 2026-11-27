@@ -88,15 +88,15 @@ class ElencoServiceTest {
         inscricao = new Inscricao(campeonato, time);
         ReflectionTestUtils.setField(inscricao, "id", UUID.randomUUID());
 
-        atleta = novoAtleta(time.getId());
+        atleta = novoAtleta(time);
 
         lenient().when(campeonatoRepository.bloquearPorInscricao(inscricao.getId())).thenReturn(Optional.of(campeonato));
         lenient().when(inscricaoRepository.findById(inscricao.getId())).thenReturn(Optional.of(inscricao));
         lenient().when(atletaRepository.findByIdAndAtivoTrue(atleta.getId())).thenReturn(Optional.of(atleta));
     }
 
-    private static Atleta novoAtleta(UUID timeId) {
-        Atleta novo = new Atleta(timeId, "Pedro Silva", "Pedrinho", LocalDate.of(2003, 5, 10), Posicao.FIXO);
+    private static Atleta novoAtleta(Time timeDoAtleta) {
+        Atleta novo = new Atleta(timeDoAtleta, "Pedro Silva", "Pedrinho", LocalDate.of(2003, 5, 10), Posicao.FIXO);
         ReflectionTestUtils.setField(novo, "id", UUID.randomUUID());
         return novo;
     }
@@ -168,7 +168,9 @@ class ElencoServiceTest {
     // Teste 15 da especificação
     @Test
     void deveLancarExcecaoQuandoAtletaForDeOutroTime() {
-        Atleta deOutroTime = novoAtleta(UUID.randomUUID());
+        Time outroTime = new Time("Elétrica FC", "ELFC", Modalidade.FUTSAL, UUID.randomUUID());
+        ReflectionTestUtils.setField(outroTime, "id", UUID.randomUUID());
+        Atleta deOutroTime = novoAtleta(outroTime);
         when(atletaRepository.findByIdAndAtivoTrue(deOutroTime.getId())).thenReturn(Optional.of(deOutroTime));
 
         assertRegra(422, "ATLETA_DE_OUTRO_TIME", () -> adicionar(deOutroTime.getId(), 10, Posicao.FIXO));
