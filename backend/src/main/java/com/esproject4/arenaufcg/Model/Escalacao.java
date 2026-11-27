@@ -60,6 +60,7 @@ public class Escalacao {
         this.time = time;
     }
 
+
     // ---------- Passo 6: métodos da base (implementados) ----------
 
     /** true se agora já passou da data/hora da partida. */

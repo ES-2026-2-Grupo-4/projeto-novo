@@ -18,6 +18,7 @@ import com.esproject4.arenaufcg.Model.Modalidade;
 import com.esproject4.arenaufcg.Service.FormacaoTaticaService;
 import com.esproject4.arenaufcg.DTO.FormacaoRequestDTO;
 import com.esproject4.arenaufcg.DTO.FormacoesResponseDTO;
+import com.esproject4.arenaufcg.DTO.EscalacaoResponseDTO;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -32,7 +33,7 @@ public class FormacaoTaticaController {
                                                 @PathVariable UUID teamId,
                                                 @Valid @RequestBody FormacaoRequestDTO dto) {
         Escalacao e = service.definirFormacao(matchId, teamId, dto.formacao(), usuario);
-        return EscalacaoResponseDTO.from(e); // ADAPTAR: use o DTO de resposta que a spec do PUT define
+        return EscalacaoResponseDTO.de(e); // ADAPTAR: use o DTO de resposta que a spec do PUT define
     }
 
     @GetMapping("/modalities/{modality}/formations")

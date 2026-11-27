@@ -2,7 +2,9 @@ package com.esproject4.arenaufcg.Model;
 
 import java.util.List;
 import java.util.Arrays;
+import lombok.Getter;
 
+@Getter
 public enum RegraModalidade {
 
     FUTEBOL(Modalidade.FUTEBOL, 11, 18, List.of("4-4-2", "4-3-3", "3-5-2", "4-2-3-1", "5-3-2")),
