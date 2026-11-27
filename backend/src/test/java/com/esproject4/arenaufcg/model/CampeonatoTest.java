@@ -292,4 +292,36 @@ class CampeonatoTest {
         assertRegra(HttpStatus.BAD_REQUEST, "DADOS_INVALIDOS", () -> new Local(" ", null, TipoLocal.CAMPO));
         assertRegra(HttpStatus.BAD_REQUEST, "DADOS_INVALIDOS", () -> new Local("Campo", null, null));
     }
+
+    // T06 - Teste 9 da especificação
+    @Test
+    void deveRecusarFaixaDeNumerosInvalida() {
+        assertRegra(HttpStatus.BAD_REQUEST, "FAIXA_DE_NUMEROS_INVALIDA",
+            () -> campeonato.definirFaixaNumeros(50, 10));
+        assertRegra(HttpStatus.BAD_REQUEST, "FAIXA_DE_NUMEROS_INVALIDA",
+            () -> campeonato.definirFaixaNumeros(-1, 10));
+        assertRegra(HttpStatus.BAD_REQUEST, "FAIXA_DE_NUMEROS_INVALIDA",
+            () -> campeonato.definirFaixaNumeros(1, 100));
+
+        assertEquals(Campeonato.NUMERO_MINIMO_PADRAO, campeonato.getNumeroMinimo());
+        assertEquals(Campeonato.NUMERO_MAXIMO_PADRAO, campeonato.getNumeroMaximo());
+
+        campeonato.definirFaixaNumeros(0, 30);
+        assertTrue(campeonato.numeroPermitido(0));
+        assertTrue(campeonato.numeroPermitido(30));
+        assertFalse(campeonato.numeroPermitido(31));
+    }
+
+    // T06 - Teste 10 da especificação
+    @Test
+    void deveBloquearMudancaDaFaixaComInscricoesAbertas() {
+        campeonato.definirFaixaNumeros(1, 30);
+        levarAte(StatusCampeonato.INSCRICOES_ABERTAS);
+
+        assertRegra(HttpStatus.UNPROCESSABLE_CONTENT, "CAMPO_BLOQUEADO",
+            () -> campeonato.definirFaixaNumeros(1, 50));
+        assertEquals(30, campeonato.getNumeroMaximo());
+
+        campeonato.definirFaixaNumeros(1, 30);
+    }
 }
