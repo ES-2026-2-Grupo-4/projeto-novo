@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.esproject4.arenaufcg.Model.User;
+import com.esproject4.arenaufcg.Model.UserRole;
 import com.esproject4.arenaufcg.Model.ValueObjects.Email;
 import com.esproject4.arenaufcg.Service.security.NotificacaoService;
 import com.esproject4.arenaufcg.Service.security.PasswordHasher;
@@ -53,10 +54,13 @@ public class AuthService {
                     "É necessário aceitar os Termos de Uso e a Política de Privacidade.");
         }
 
-        if (dto.perfil() == null) {
-            throw new RegraNegocioException(HttpStatus.BAD_REQUEST, "PERFIL_INVALIDO",
-                    "O perfil informado é inválido.");
-        }
+        if (dto.perfil() == null || dto.perfil() == UserRole.ADMIN) {
+            throw new RegraNegocioException(
+                HttpStatus.BAD_REQUEST,
+                "PERFIL_INVALIDO",
+                "O perfil informado não é permitido no cadastro público."
+        );
+}
         validarSenha(dto.senha(), dto.confirmaSenha());
 
         Email email = criarEmail(dto.email());

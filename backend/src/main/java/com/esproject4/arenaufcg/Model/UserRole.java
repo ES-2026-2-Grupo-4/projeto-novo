@@ -4,5 +4,6 @@ public enum UserRole {
     ORGANIZADOR,
     DIRIGENTE,
     ARBITRO,
-    ESPECTADOR
+    ESPECTADOR,
+    ADMIN
 }

@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.esproject4.arenaufcg.DTO.InscricaoResponseDTO;
 import com.esproject4.arenaufcg.DTO.MotivoRequestDTO;
+import com.esproject4.arenaufcg.Model.PermissaoSistema;
 import com.esproject4.arenaufcg.Model.StatusInscricao;
+import com.esproject4.arenaufcg.Security.RequerPermissao;
 import com.esproject4.arenaufcg.Service.AuthService;
 import com.esproject4.arenaufcg.Service.InscricaoOrganizadorService;
 
@@ -28,6 +30,12 @@ public class InscricaoOrganizadorController {
         this.authService = authService;
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.INSCRICAO_DECIDIR
+        }
+    )
     @GetMapping("/api/v1/championships/{championshipId}/registrations")
     public ResponseEntity<Page<InscricaoResponseDTO>> listar(
             @PathVariable UUID championshipId,
@@ -40,6 +48,13 @@ public class InscricaoOrganizadorController {
         );
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.INSCRICAO_DECIDIR
+        },
+        acao = "INSCRICAO_APROVAR"
+    )
     @PostMapping("/api/v1/registrations/{registrationId}/approve")
     public ResponseEntity<InscricaoResponseDTO> aprovar(
             @PathVariable UUID registrationId,
@@ -48,6 +63,13 @@ public class InscricaoOrganizadorController {
         return ResponseEntity.ok(service.aprovar(registrationId, usuarioId(authorization)));
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.INSCRICAO_DECIDIR
+        },
+        acao = "INSCRICAO_RECUSAR"
+    )
     @PostMapping("/api/v1/registrations/{registrationId}/reject")
     public ResponseEntity<InscricaoResponseDTO> recusar(
             @PathVariable UUID registrationId,
@@ -59,6 +81,13 @@ public class InscricaoOrganizadorController {
         );
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_ORGANIZADOR_ACESSO,
+            PermissaoSistema.INSCRICAO_DECIDIR
+        },
+        acao = "INSCRICAO_REMOVER"
+    )
     @PostMapping("/api/v1/registrations/{registrationId}/remove")
     public ResponseEntity<InscricaoResponseDTO> remover(
             @PathVariable UUID registrationId,

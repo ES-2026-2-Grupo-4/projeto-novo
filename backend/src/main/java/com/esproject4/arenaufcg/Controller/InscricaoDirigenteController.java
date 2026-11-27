@@ -11,7 +11,9 @@ import com.esproject4.arenaufcg.DTO.CriarInscricaoRequest;
 import com.esproject4.arenaufcg.DTO.InscricaoResponseDTO;
 import com.esproject4.arenaufcg.DTO.UserResponseDTO;
 import com.esproject4.arenaufcg.Exception.RegraNegocioException;
+import com.esproject4.arenaufcg.Model.PermissaoSistema;
 import com.esproject4.arenaufcg.Model.UserRole;
+import com.esproject4.arenaufcg.Security.RequerPermissao;
 import com.esproject4.arenaufcg.Service.AuthService;
 import com.esproject4.arenaufcg.Service.InscricaoDirigenteService;
 
@@ -28,6 +30,13 @@ public class InscricaoDirigenteController {
         this.authService = authService;
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_DIRIGENTE_ACESSO,
+            PermissaoSistema.INSCRICAO_SOLICITAR
+        },
+        acao = "INSCRICAO_SOLICITAR"
+    )
     @PostMapping("/api/v1/championships/{championshipId}/registrations")
     public ResponseEntity<InscricaoResponseDTO> solicitar(
             @PathVariable UUID championshipId,
@@ -41,6 +50,13 @@ public class InscricaoDirigenteController {
         );
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_DIRIGENTE_ACESSO,
+            PermissaoSistema.INSCRICAO_SOLICITAR
+        },
+        acao = "INSCRICAO_CANCELAR"
+    )
     @PostMapping("/api/v1/registrations/{registrationId}/cancel")
     public ResponseEntity<InscricaoResponseDTO> cancelar(
             @PathVariable UUID registrationId,
@@ -53,6 +69,12 @@ public class InscricaoDirigenteController {
         );
     }
 
+    @RequerPermissao(
+        value = {
+            PermissaoSistema.AREA_DIRIGENTE_ACESSO,
+            PermissaoSistema.INSCRICAO_SOLICITAR
+        }
+    )
     @GetMapping("/api/v1/teams/{teamId}/registrations")
     public ResponseEntity<List<InscricaoResponseDTO>> listar(
             @PathVariable UUID teamId,

@@ -1,0 +1,31 @@
+package com.esproject4.arenaufcg.Model;
+
+public enum PermissaoSistema {
+
+    // Administrador
+    AREA_ADMIN_ACESSO,
+    GERENCIAR_PERMISSOES,
+    GERENCIAR_ADMINS,
+    VISUALIZAR_LOGS,
+
+    // Organizador
+    AREA_ORGANIZADOR_ACESSO,
+    CAMPEONATO_CRIAR,
+    CAMPEONATO_GERENCIAR,
+    INSCRICAO_DECIDIR,
+    LOCAL_CADASTRAR,
+
+    // Dirigente
+    AREA_DIRIGENTE_ACESSO,
+    TIME_GERENCIAR,
+    INSCRICAO_SOLICITAR,
+    ELENCO_GERENCIAR,
+
+    // Árbitro
+    AREA_ARBITRO_ACESSO,
+    SUMULA_REGISTRAR,
+
+    // Espectador
+    AREA_ESPECTADOR_ACESSO,
+    CAMPEONATO_VISUALIZAR
+}
