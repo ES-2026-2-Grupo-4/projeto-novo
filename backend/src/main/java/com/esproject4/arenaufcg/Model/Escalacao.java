@@ -22,6 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
@@ -31,6 +32,7 @@ import jakarta.persistence.Version;
 @Entity
 @Table(name = "lineups", uniqueConstraints = @UniqueConstraint(
         name = "uk_lineups_match_team", columnNames = {"match_id", "team_id"}))
+
 public class Escalacao {
 
     @Id
@@ -80,6 +82,7 @@ public class Escalacao {
             throw new RegraNegocioException(HttpStatus.UNPROCESSABLE_CONTENT, "TIME_FORA_DA_PARTIDA",
                     "Este time não joga esta partida.");
         }
+
         this.partida = partida;
         this.time = time;
     }
@@ -133,7 +136,16 @@ public class Escalacao {
     // =====================================================================
 
     public void definirFormacao(String formacao, OffsetDateTime agora) {
-        throw new UnsupportedOperationException("t08/formacao: a implementar");
+         if (estaFechada(agora)) {
+        throw new RegraNegocioException(HttpStatus.CONFLICT,
+                "ESCALACAO_FECHADA", "A escalação desta partida já está fechada.");
+        }
+        RegraModalidade regra = RegraModalidade.de(time.getModalidade());
+        if (formacao == null || !regra.getFormacoes().contains(formacao)) {
+            throw new RegraNegocioException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "FORMACAO_INVALIDA", "Formação não aceita para esta modalidade.");
+        }
+        this.formacao = formacao;
     }
 
     // =====================================================================
@@ -173,3 +185,4 @@ public class Escalacao {
         return updatedAt;
     }
 }
+
